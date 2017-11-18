@@ -1,0 +1,389 @@
+<template>
+  <div>
+      <div class="row main-title">
+        <h3 align="center">Lista de colegios</h3>
+        <hr>
+      </div>
+      <div class="row">
+		  		<div class="col-md-4">
+		  			<button class="btn btn-success" @click="openNewModal(); changeFormType('new')">Nuevo</button>
+		  		</div>
+		  		<div class="col-md-8">
+					<input
+                        v-model="searchParam"
+                        type="text"
+                        class="form-control"
+                        placeholder="Buscar...">
+		  		</div>
+	    </div>
+      <br>    
+      <div class="row">
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Colegio</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="school in schools">
+              <td>{{school.id_colegio}}</td>
+              <td>{{school.des_colegio}}</td>
+              <td>
+                <button class="btn btn-info" @click="openNewModal(); getSchool(school.id_colegio); changeFormType('view')">Ver</button>
+                <button class="btn btn-primary"@click="openNewModal(); getSchool(school.id_colegio); changeFormType('edit')">Editar</button>
+            </td>
+            </tr>
+          </tbody>
+        </table>
+         <vue-simple-spinner v-if="showSpinner" size="large" message="Cargando..." :speed="0.4"></vue-simple-spinner>
+         <hr>        
+      </div>
+      <!--
+      <alert :show.sync="modalIsOpen" type="info">
+        <b>Info</b>
+      </alert>
+      -->   
+
+    <modal :show.sync="modalNewIsOpen" effect="fade" width="400">
+      <div slot="modal-header" class="modal-header">
+        <h4 class="modal-title">
+        Registro de Colegio
+        </h4>
+      </div>
+      <div slot="modal-body" class="modal-body">
+          <div @submit.prevent="validateBeforeSubmit" class="my-form">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-horizontal">
+                        <div class="form-group" :class="{'has-error': errors.has('schooldata.id_colegio')}">
+                            <label class="control-label col-sm-4">ID:</label>
+                            <div class="col-sm-8">
+                                <input v-validate.initial="schooldata.id_colegio"  data-vv-rules="required" :disabled="formType=='view' || formType=='edit'" type="number" v-model ="schooldata.id_colegio" class="form-control" >
+                                <p class="text-danger" v-if="errors.has('schooldata.id_colegio')">ID es requerido</p>
+                            </div>
+                        </div>
+                        <div class="form-group" :class="{'has-error': errors.has('schooldata.des_colegio') }">
+                            <label class="control-label col-sm-4" >Colegio:</label>
+                            <div class="col-sm-8">
+                                <input v-validate.initial="schooldata.des_colegio" @change="existsSchoolName()" data-vv-rules="required" :disabled="formType=='view'" type="text" v-model ="schooldata.des_colegio" class="form-control">
+                                <p class="text-danger" v-if="errors.has('schooldata.des_colegio')">Nombre es requerido</p>
+                                <vue-simple-spinner v-if="checkNameSpinner" size="small" message="Validando Nombre..." :speed="0.4"></vue-simple-spinner>                                
+                                <span v-if="canUseName" class="label label-success">Nombre validado</span>
+                                <span v-if="existSchoolName" class="label label-danger">Este nombre ya existe</span>
+                            </div>
+                        </div>                    
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" >Observacion:</label>
+                            <div class="col-sm-8">
+                                <textarea :disabled="formType=='view'" class="form-control" rows="5" v-model ="schooldata.observacion"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-horizontal">
+                        <div class="form-group" :class="{'has-error': errors.has('depSelected')}">
+                            <label class="control-label col-sm-4">Departamento:</label>                        
+                            <div class="col-sm-8">
+                                    <select v-validate.initial="depSelected"  data-vv-rules="required" :disabled="formType=='view'" class="form-control" v-model="depSelected">
+                                        <option value=""></option>  
+                                        <option v-bind:value="department.id_departamento" v-for="department in departments">{{department.des_departamento}}</option>
+                                    </select>
+                                    <p class="text-danger" v-if="errors.has('depSelected')">Departamento es requerido</p>
+                            </div>
+                        </div>
+                        <div class="form-group" :class="{'has-error': errors.has('provSelected')}">
+                            <label class="control-label col-sm-4" >Provincia:</label>
+                            <div class="col-sm-8">
+                                    <select v-validate.initial="provSelected"  data-vv-rules="required" class="form-control" v-model="provSelected" :disabled="depSelected == '' || depSelected == null || formType=='view'">
+                                        <option value=""></option>  
+                                        <option v-bind:value="province.id_provincia" v-for="province in provincies">{{province.des_provincia}}</option>
+                                    </select>
+                                    <p class="text-danger" v-if="errors.has('provSelected')">Provincia es requerida</p>
+                            </div>
+                        </div>                    
+                        <div class="form-group" :class="{'has-error': errors.has('schooldata.id_distrito')}">
+                            <label class="control-label col-sm-4" >Distrito:</label>
+                            <div class="col-sm-8">                            
+                                    <select v-validate.initial="schooldata.id_distrito"  data-vv-rules="required" class="form-control" v-model="schooldata.id_distrito" :disabled="provSelected =='' || provSelected == null || formType=='view'">
+                                        <option value=""></option>  
+                                        <option v-bind:value="district.id_distrito" v-for="district in districts">{{district.des_distrito}}</option>
+                                    </select>
+                                    <p class="text-danger" v-if="errors.has('schooldata.id_colegio')">Distrito es requerido</p>
+                            </div>                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <label>Seleccione:</label>
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                        <th></th>
+                        <th>Grado Escolar</th>
+                        <th>Nivel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="grade in schoolGrades">
+                            <td align="center">
+                                <label>
+                                    <input
+                                        :disabled="formType=='view'"
+                                        v-bind:value="grade.id_grado_escolar"
+                                        type="checkbox"
+                                        v-model="schooldata.school_grades_id"
+                                        >
+                                </label>
+                            </td>
+                            <td>{{grade.des_grado_escolar}}</td>
+                            <td>{{grade.nivel_grado_escolar}}</td>
+                        </tr>
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+          </div>
+      </div>
+      <div slot="modal-footer" class="modal-footer">          
+        <button type="button" class="btn btn-danger" v-if="formType != 'view' "@click="saveOrUpdateSchool()">Guardar</button>
+        <button type="button" class="btn btn-primary" @click="closeModal()">Cancelar</button>        
+      </div>
+    </modal>
+ </div>
+</template>
+<style>
+  .main-title{
+      margin-bottom: 6%;
+  }
+  .my-form .control-label{
+      text-align: left !important;
+  }
+  
+</style>
+<script>
+    import VueStrap from 'vue-strap'
+    import Spinner from 'vue-simple-spinner'    
+    export default{
+      data(){
+        return{
+          showSpinner : false,
+          schools: [],
+          provincies: [],
+          departments: [],
+          schoolGrades: [],
+          districts: [],
+          searchParam : null,          
+          modalIsOpen: false,
+          modalNewIsOpen: false,
+          searchParam : null,
+          schooldata :{
+              school_grades_id : [],
+              id_distrito: null
+          },          
+          depSelected : null,
+          provSelected : null,
+          formType: '',
+          formSubmitted: false,
+          existSchoolName: false,
+          checkNameSpinner: false,
+          canUseName: false,
+          temporaryEditName : null
+        }
+      },
+      created(){
+            this.allSchools()
+            this.allDistricts()
+            this.allPronvicies()
+            this.allDepartments()
+            this.allSchoolGrades()
+      },
+      methods: {
+        existsSchoolName(){
+            if(this.schooldata.des_colegio){
+                if(this.formType == 'new'){
+                    this.checkNameSpinner = true
+                    this.$http.get("api/validate-school-name/"+this.schooldata.des_colegio)
+                    .then(response=>{
+                        this.checkNameSpinner = false
+                        this.existSchoolName = response.body.exists
+                        this.canUseName =   !this.existSchoolName ? true : false
+                    })
+                }
+                else{
+                    this.checkNameSpinner = true
+                    this.$http.get("api/validate-school-name/"+this.schooldata.des_colegio)
+                    .then(response=>{
+                        this.checkNameSpinner = false
+                        this.existSchoolName = response.body.exists && (response.body.name_founded != this.temporaryEditName) ? true : false
+                        this.canUseName =   !this.existSchoolName ? true : false
+                    })
+                }
+            }
+
+        },
+        validateBeforeSubmit(){
+            this.$validator.validateAll();
+        },
+        submitForm(){
+            this.formSubmitted = true
+        },
+          allSchools(){
+              this.showSpinner = true
+            this.$http.get("api/school")
+              .then(response=>{
+                  this.schools = response.body
+                  this.showSpinner = false
+              })
+          },          
+          allDepartments(){
+            this.$http.get("api/department")
+              .then(response=>{
+                  this.departments = response.body
+              })
+          }, 
+          allPronvicies(){              
+              if(this.depSelected){                  
+                this.$http.get("api/province-by-department/"+this.depSelected)
+                .then(response=>{
+                    this.provincies = response.body
+                })                  
+              }
+          },
+          allDistricts(){
+              if(this.provSelected){
+                  this.$http.get("api/district-by-province/"+this.provSelected)
+                    .then(response=>{
+                        this.districts = response.body
+                    })
+              }
+            
+          },    
+          allSchoolGrades(){
+            this.$http.get("api/school-grade")
+              .then(response=>{
+                  this.schoolGrades = response.body
+              })
+          },
+          openModal() {
+              this.modalIsOpen = true
+          },          
+          openNewModal() {
+              this.modalNewIsOpen = true
+          },
+          closeModal(){
+            this.modalIsOpen = false
+            this.modalNewIsOpen = false
+            this.schooldata = {}
+          },          
+          getSchool(id){
+            this.$http.get("api/school/"+id).then((response)=>{
+                this.depSelected = response.body.district.province.id_departamento
+                this.provSelected = response.data.district.id_provincia
+                this.schooldata = response.body
+
+                //store name to compare in edit modal
+                this.temporaryEditName = this.schooldata.des_colegio 
+
+                this.allPronvicies()
+                this.allDistricts()
+
+                var grades_ids = response.body.school_grades
+                //getting only the ids
+
+                this.schooldata.school_grades_id = []      
+                grades_ids.forEach(function(element) {
+                   this.schooldata.school_grades_id.push(element.id_grado_escolar)
+               }, this);
+            });
+          },
+          searchSchool(){              
+            if(this.searchParam!=''){
+                this.showSpinner = true          
+                this.$http.get("api/search-school/"+this.searchParam).then((response)=>{
+                    this.schools = response.body
+                    this.showSpinner = false                 
+                })
+            }
+            else{
+                this.allSchools()
+            }
+          },
+          saveOrUpdateSchool(){              
+            this.$validator.validateAll();
+            if(this.existSchoolName){
+                alert("Este nombre ya existe, por favor ingrese otro")
+                return
+            }
+            if (!this.errors.any()) {
+                if(this.schooldata.school_grades_id.length > 0){
+                    if(this.formType == "new"){
+                        this.saveSchool()
+                    }
+                    else if(this.formType == "edit"){
+                        this.updateSchool()
+                    }
+                }
+                else{
+                    alert("Por favor seleccione por lo menos un grado")
+                }
+            }
+                     
+          },
+          saveSchool(){
+                this.$http.post("api/school/",this.schooldata).then(()=>{
+                    this.allSchools()
+                    alert("Guardado exitosamente")
+                    this.closeModal()
+                })                
+          },          
+          updateSchool(){           
+                this.$http.put("api/school/"+this.schooldata.id_colegio,this.schooldata).then((response)=>{
+                    this.allSchools()
+                    alert("Actualizado exitosamente")
+                    this.closeModal()
+                }, (error) =>{
+                    //console.log("heree")
+                })
+          },
+          changeFormType(type){
+              this.checkNameSpinner = false
+              this.canUseName = false
+              this.existSchoolName = false
+              this.formType = type
+              if(type == 'new'){
+                this.schooldata.school_grades_id = []
+              }
+          }
+      },
+      watch : {
+          searchParam: function(){
+              this.searchSchool()
+          },
+          depSelected: function(){
+              if(this.formType == 'new')
+              {
+                  this.provSelected = null
+              }
+              this.allPronvicies()
+          },
+          provSelected: function(){
+              if(this.formType == 'new')
+              {
+                  this.schooldata.id_distrito = null
+              }
+              this.allDistricts()
+          }
+      },
+      components :{
+         'alert': VueStrap.alert,
+         'modal' : VueStrap.modal,
+         'vue-simple-spinner': Spinner
+      }
+    }
+</script>
+
