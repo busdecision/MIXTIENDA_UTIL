@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from './components/authentication/Login.vue'
-import Register from './components/authentication/Register.vue'
-import Dashboard from './components/Dashboard.vue'
+import Login from './components/pages/authentication/Login.vue'
+import Register from './components/pages/authentication/Register.vue'
+import Dashboard from './components/pages/dashboard/Dashboard.vue'
 import School from './components/pages/school/School.vue'
 
 Vue.use(VueRouter)

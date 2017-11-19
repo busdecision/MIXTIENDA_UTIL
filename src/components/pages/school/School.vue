@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="school-content">
       <div class="row main-title">
         <h3 align="center">Lista de colegios</h3>
         <hr>
@@ -12,13 +12,13 @@
 					<input
                         v-model="searchParam"
                         type="text"
-                        class="form-control"
+                        class="form-control input-sm"
                         placeholder="Buscar...">
 		  		</div>
 	    </div>
       <br>    
       <div class="row">
-        <table class="table table-striped table-bordered">
+        <table class="table table-striped table-bordered table-condensed">
           <thead>
             <tr>
               <th>ID</th>
@@ -31,8 +31,8 @@
               <td>{{school.id_colegio}}</td>
               <td>{{school.des_colegio}}</td>
               <td>
-                <button class="btn btn-info" @click="openNewModal(); getSchool(school.id_colegio); changeFormType('view')">Ver</button>
-                <button class="btn btn-primary"@click="openNewModal(); getSchool(school.id_colegio); changeFormType('edit')">Editar</button>
+                <button class="btn btn-info btn-sm" @click="openNewModal(); getSchool(school.id_colegio); changeFormType('view')">Ver</button>
+                <button class="btn btn-primary btn-sm"@click="openNewModal(); getSchool(school.id_colegio); changeFormType('edit')">Editar</button>
             </td>
             </tr>
           </tbody>
@@ -60,14 +60,14 @@
                         <div class="form-group" :class="{'has-error': errors.has('schooldata.id_colegio')}">
                             <label class="control-label col-sm-4">ID:</label>
                             <div class="col-sm-8">
-                                <input v-validate.initial="schooldata.id_colegio"  data-vv-rules="required" :disabled="formType=='view' || formType=='edit'" type="number" v-model ="schooldata.id_colegio" class="form-control" >
+                                <input v-validate.initial="schooldata.id_colegio"  data-vv-rules="required" :disabled="formType=='view' || formType=='edit'" type="number" v-model ="schooldata.id_colegio" class="form-control input-sm" >
                                 <p class="text-danger" v-if="errors.has('schooldata.id_colegio')">ID es requerido</p>
                             </div>
                         </div>
                         <div class="form-group" :class="{'has-error': errors.has('schooldata.des_colegio') }">
                             <label class="control-label col-sm-4" >Colegio:</label>
                             <div class="col-sm-8">
-                                <input v-validate.initial="schooldata.des_colegio" @change="existsSchoolName()" data-vv-rules="required" :disabled="formType=='view'" type="text" v-model ="schooldata.des_colegio" class="form-control">
+                                <input v-validate.initial="schooldata.des_colegio" @change="existsSchoolName()" data-vv-rules="required" :disabled="formType=='view'" type="text" v-model ="schooldata.des_colegio" class="form-control input-sm">
                                 <p class="text-danger" v-if="errors.has('schooldata.des_colegio')">Nombre es requerido</p>
                                 <vue-simple-spinner v-if="checkNameSpinner" size="small" message="Validando Nombre..." :speed="0.4"></vue-simple-spinner>                                
                                 <span v-if="canUseName" class="label label-success">Nombre validado</span>
@@ -77,7 +77,7 @@
                         <div class="form-group">
                             <label class="control-label col-sm-4" >Observacion:</label>
                             <div class="col-sm-8">
-                                <textarea :disabled="formType=='view'" class="form-control" rows="5" v-model ="schooldata.observacion"></textarea>
+                                <textarea :disabled="formType=='view'" class="form-control input-sm" rows="5" v-model ="schooldata.observacion"></textarea>
                             </div>
                         </div>
                     </div>
@@ -87,7 +87,7 @@
                         <div class="form-group" :class="{'has-error': errors.has('depSelected')}">
                             <label class="control-label col-sm-4">Departamento:</label>                        
                             <div class="col-sm-8">
-                                    <select v-validate.initial="depSelected"  data-vv-rules="required" :disabled="formType=='view'" class="form-control" v-model="depSelected">
+                                    <select v-validate.initial="depSelected"  data-vv-rules="required" :disabled="formType=='view'" class="form-control input-sm" v-model="depSelected">
                                         <option value=""></option>  
                                         <option v-bind:value="department.id_departamento" v-for="department in departments">{{department.des_departamento}}</option>
                                     </select>
@@ -97,7 +97,7 @@
                         <div class="form-group" :class="{'has-error': errors.has('provSelected')}">
                             <label class="control-label col-sm-4" >Provincia:</label>
                             <div class="col-sm-8">
-                                    <select v-validate.initial="provSelected"  data-vv-rules="required" class="form-control" v-model="provSelected" :disabled="depSelected == '' || depSelected == null || formType=='view'">
+                                    <select v-validate.initial="provSelected"  data-vv-rules="required" class="form-control input-sm" v-model="provSelected" :disabled="depSelected == '' || depSelected == null || formType=='view'">
                                         <option value=""></option>  
                                         <option v-bind:value="province.id_provincia" v-for="province in provincies">{{province.des_provincia}}</option>
                                     </select>
@@ -107,7 +107,7 @@
                         <div class="form-group" :class="{'has-error': errors.has('schooldata.id_distrito')}">
                             <label class="control-label col-sm-4" >Distrito:</label>
                             <div class="col-sm-8">                            
-                                    <select v-validate.initial="schooldata.id_distrito"  data-vv-rules="required" class="form-control" v-model="schooldata.id_distrito" :disabled="provSelected =='' || provSelected == null || formType=='view'">
+                                    <select v-validate.initial="schooldata.id_distrito"  data-vv-rules="required" class="form-control input-sm" v-model="schooldata.id_distrito" :disabled="provSelected =='' || provSelected == null || formType=='view'">
                                         <option value=""></option>  
                                         <option v-bind:value="district.id_distrito" v-for="district in districts">{{district.des_distrito}}</option>
                                     </select>
@@ -120,7 +120,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <label>Seleccione:</label>
-                <table class="table table-striped table-bordered">
+                <table class="table table-striped table-bordered table-condensed">
                     <thead>
                         <tr>
                         <th></th>
@@ -162,12 +162,21 @@
   }
   .my-form .control-label{
       text-align: left !important;
+      font-size: 12px;
   }
+   .my-form input{
+       font-size: 12px;
+   }
+   .table tbody{
+       font-size: 12px;
+   }
   
 </style>
 <script>
     import VueStrap from 'vue-strap'
-    import Spinner from 'vue-simple-spinner'    
+    import Spinner from 'vue-simple-spinner'
+    import swal from 'sweetalert2'
+
     export default{
       data(){
         return{
@@ -201,7 +210,7 @@
             this.allPronvicies()
             this.allDepartments()
             this.allSchoolGrades()
-      },
+      },      
       methods: {
         existsSchoolName(){
             if(this.schooldata.des_colegio){
@@ -316,7 +325,11 @@
           saveOrUpdateSchool(){              
             this.$validator.validateAll();
             if(this.existSchoolName){
-                alert("Este nombre ya existe, por favor ingrese otro")
+                swal(
+                    'Oops...',
+                    'Este nombre ya existe, por favor ingrese otro',
+                    'error'
+                )
                 return
             }
             if (!this.errors.any()) {
@@ -329,7 +342,11 @@
                     }
                 }
                 else{
-                    alert("Por favor seleccione por lo menos un grado")
+                    swal(
+                        'Oops...',
+                        'Por favor seleccione por lo menos un grado',
+                        'error'
+                    )
                 }
             }
                      
@@ -337,17 +354,41 @@
           saveSchool(){
                 this.$http.post("api/school/",this.schooldata).then(()=>{
                     this.allSchools()
-                    alert("Guardado exitosamente")
-                    this.closeModal()
-                })                
+                    swal({
+                        position: 'top-right',
+                        type: 'success',
+                        title: 'Guardado exitosamente',
+                        showConfirmButton: false,
+                        timer: 1500                        
+                    }).then(()=>{
+                        this.closeModal()
+                    })
+                },(error)=>{
+                    swal(
+                        'Oops...',
+                        'Hubo un error al guardar',
+                        'error'
+                    )
+                })
           },          
           updateSchool(){           
                 this.$http.put("api/school/"+this.schooldata.id_colegio,this.schooldata).then((response)=>{
                     this.allSchools()
-                    alert("Actualizado exitosamente")
-                    this.closeModal()
+                    swal({
+                        position: 'top-right',
+                        type: 'success',
+                        title: 'Guardado exitosamente',
+                        showConfirmButton: false,
+                        timer: 1500,                        
+                    }).then( ()=>{
+                            this.closeModal()
+                        })
                 }, (error) =>{
-                    //console.log("heree")
+                    swal(
+                        'Oops...',
+                        'Hubo un error al guardar',
+                        'error'
+                    )
                 })
           },
           changeFormType(type){
