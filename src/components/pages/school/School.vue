@@ -1,5 +1,5 @@
 <template>
-  <div class="school-content">
+  <div class="school-content container">
       <div class="row main-title">
         <h3 align="center">Lista de colegios</h3>
         <hr>
@@ -47,7 +47,7 @@
       -->   
 
     <modal :show.sync="modalNewIsOpen" effect="fade" width="400">
-      <div slot="modal-header" class="modal-header">
+      <div slot="modal-header" class="modal-header" align="center">
         <h4 class="modal-title">
         Registro de Colegio
         </h4>
@@ -277,10 +277,7 @@
               .then(response=>{
                   this.schoolGrades = response.body
               })
-          },
-          openModal() {
-              this.modalIsOpen = true
-          },          
+          },         
           openNewModal() {
               this.modalNewIsOpen = true
           },
