@@ -17,8 +17,12 @@
                   <div class="form-horizontal">
                         <div class="form-group">
                             <label class="control-label col-sm-1">Ver</label>
-                            <div class="col-sm-4">
-                                <input type="number" class="form-control input-sm" >                                
+                            <div class="col-sm-5">                                
+                                <select class="form-control input-sm" v-model="sizeData">                                      
+                                    <option v-bind:value="10">10</option>
+                                    <option v-bind:value="25">25</option>
+                                    <option v-bind:value="50">50</option>
+                                </select>                               
                             </div>
                             <div class="col-sm-4">
                                 <label class="control-label">registros</label>
@@ -27,7 +31,8 @@
                   </div>
             </div>
             <div class="col-md-8">
-                <input                    
+                <input
+                    v-model="searchParam"
                     type="text"
                     class="form-control input-sm"
                     placeholder="Buscar...">
@@ -46,10 +51,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>TEST</td>
-                            <td>ME342</td>
+                        <tr v-for ="group in productGroups">
+                            <td>{{group.id_grupo_producto}}</td>
+                            <td>{{group.des_grupo_producto}}</td>
+                            <td>{{group.cod_grupo_producto}}</td>
                             <td>
                                 <button class="btn btn-info btn-sm" @click="openViewModal();">Ver</button>
                                 <button class="btn btn-primary btn-sm"@click="openNewModal(); getSchool(school.id_colegio); changeFormType('edit')">Editar</button>
@@ -57,16 +62,24 @@
                         </tr>
                     </tbody>
                 </table>
-            <!--<vue-simple-spinner v-if="showSpinner" size="large" message="Cargando..." :speed="0.4"></vue-simple-spinner>-->    
+                <vue-simple-spinner v-if="showSpinner" size="large" message="Cargando..." :speed="0.4"></vue-simple-spinner>
           </div>
       </div>
       <div class="row" align="center">
             <ul class="pagination">
-                <li><a href="#">1</a></li>
-                <li class="active"><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li><a href="#">5</a></li>
+                 <li>
+                    <a v-on:click="changePage(currentPage-1)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li v-for="(item, index) in getNumber(totalPages)" v-bind:class="{ active:  (index+1 == currentPage)}">
+                    <a @click="changePage(index+1)">{{index+1}}</a>
+                </li>
+                <li>
+                    <a v-on:click="changePage(currentPage+1)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
             </ul>
       </div>
 
@@ -230,11 +243,29 @@
     export default{
         data(){
            return {
+                showSpinner : false,
                 modalNewIsOpen : false,
-                viewModalIsOpen : false
+                viewModalIsOpen : false,
+                productGroups : [],
+                currentPage : 1,
+                sizeData : 10,
+                searchParam : null,
+                totalPages : 0
            }
         },
+        created(){
+            this.searchProductGroups()
+        },
         methods : {
+          searchProductGroups(){
+            this.showSpinner = true
+            this.$http.get("api/search-product-group/"+this.searchParam+"?size="+this.sizeData+"&page="+this.currentPage)
+              .then(response=>{
+                  this.showSpinner = false
+                  this.productGroups = response.body.data
+                  this.totalPages = response.body.last_page
+              })
+          },  
           openNewModal() {
               this.modalNewIsOpen = true
           },
@@ -246,7 +277,28 @@
           },
          closeViewModal(){
               this.viewModalIsOpen = false
-          }
+          },
+         getNumber(num){
+            return new Array(num);
+         },
+         changePage(page){
+             if(page != 0 && page <= this.totalPages){
+                this.currentPage = page
+                this.searchProductGroups()
+             }             
+         }         
+        },
+        watch : {
+            sizeData: function(){
+                this.currentPage = 1
+                this.searchProductGroups()
+            },
+            searchParam: function(){
+                if(this.searchParam == ''){                    
+                    this.searchParam = null
+                }
+                this.searchProductGroups()
+            }
         },
         components :{
          'alert': VueStrap.alert,
