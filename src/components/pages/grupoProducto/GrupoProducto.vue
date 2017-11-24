@@ -8,7 +8,7 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <button class="btn btn-success" @click="openNewModal()">Nuevo</button>
+                <button class="btn btn-success" @click="openModal('new')">Nuevo</button>
             </div>
         </div>
         </br>
@@ -56,8 +56,8 @@
                             <td>{{group.des_grupo_producto}}</td>
                             <td>{{group.cod_grupo_producto}}</td>
                             <td>
-                                <button class="btn btn-info btn-sm" @click="openViewModal();">Ver</button>
-                                <button class="btn btn-primary btn-sm"@click="openNewModal(); getSchool(school.id_colegio); changeFormType('edit')">Editar</button>
+                                <button class="btn btn-info btn-sm" @click="openModal('view'); findProductGroup(group.id_grupo_producto);">Ver</button>
+                                <button class="btn btn-primary btn-sm"@click="openModal('edit'); findProductGroup(group.id_grupo_producto);">Editar</button>
                             </td>
                         </tr>
                     </tbody>
@@ -82,157 +82,171 @@
                 </li>
             </ul>
       </div>
-
-    <modal :show.sync="modalNewIsOpen" effect="fade" width="400">
+    <modal :show.sync="modalIsOpen" effect="fade" width="400">
         <div slot="modal-header" class="modal-header" align="center">
-            <h4 class="modal-title">
-            Registrar Grupo Poducto
-            </h4>
+            <h4 class="modal-title" v-if="formType == 'new'">Registrar Grupo Poducto</h4>
+            <h4 class="modal-title" v-if="formType == 'edit'">Editar Grupo Poducto</h4>
+            <h4 class="modal-title" v-if="formType == 'view'">Grupo Poducto</h4>
         </div>
         <div slot="modal-body" class="modal-body">
-            <div class="my-form">            
-                <div class="row">
-                    <div class="col-md-10 col-md-offset-2">
-                        <form class="form-inline">
-                            <div class="form-group col-md-12">
-                                <label class="col-md-4">ID:</label>
-                                <input type="number" class="form-control col-md-8 input-sm" id="email">
-                            </div>
-                            <div class="form-group col-md-12">
-                                <label class="col-md-4">Grupo Producto:</label>
-                                <input type="text" class="form-control col-md-8 input-sm" id="pwd">
-                            </div>
-                             <div class="form-group col-md-12">
-                                <label class="col-md-4">Código:</label>
-                                <input type="text" class="form-control col-md-8 input-sm" id="pwd">
-                            </div>
-                             <div class="form-group col-md-12">
-                                <label class="col-md-4">Color:</label>
-                                <input type="text" class="form-control col-md-8 input-sm" id="pwd">
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <br>
-                <div class="row">
-                        <div class="col-md-5">
-                            <input
-                            type="text"
-                            class="form-control input-sm"
-                            placeholder="Buscar producto...">
-                        </div>
-                </div>
-                <br>
-                <div class="row">
-                    <div class="col-md-5">
-                        <table class="table table-striped table-bordered table-condensed">
-                        <thead>
-                            <tr>
-                            <th></th>
-                            <th>Producto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>TEST</td>
-                            </tr>
-                        </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-2">
-                       <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-                    </div>
-                    <div class="col-md-5">
-                        <table class="table table-striped table-bordered table-condensed">
-                        <thead>
-                            <tr>
-                            <th>Producto</th>
-                            <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>test2</td>
-                                <td>Eliminar</td>
-                            </tr>
-                        </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div slot="modal-footer" class="modal-footer">          
-            <button type="button" class="btn btn-danger" @click="saveOrUpdateSchool()">Guardar</button>
-            <button type="button" class="btn btn-primary" @click="closeModal()">Cancelar</button>        
-        </div>
-    </modal>
-    <modal :show.sync="viewModalIsOpen" effect="fade" width="400">
-        <div slot="modal-header" class="modal-header" align="center">
-            <h4 class="modal-title">
-            Registrar Grupo Poducto
-            </h4>
-        </div>
-        <div slot="modal-body" class="modal-body">
-            <div class="my-form">            
+            <div class="my-form" @submit.prevent="validateBeforeSubmit">            
                 <div class="row">
                     <div class="col-md-12">
                         <form class="form-horizontal">
                             <div class="form-group col-md-12">                           
                                 <label class="control-label col-sm-4" for="email">ID:</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control input-sm" id="email">
+                                    <input type="text" class="form-control input-sm" v-model="groupProductData.id_grupo_producto" :disabled="true">
                                 </div>
                             </div>
-                            <div class="form-group col-md-12">
+                            <div class="form-group col-md-12" :class="{'has-error': errors.has('groupProductData.des_grupo_producto')}">
                                 <label class="control-label col-sm-4" for="email">Grupo Producto:</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control input-sm" id="pwd">
+                                    <input  type="text" class="form-control input-sm"
+                                            data-vv-rules="required"
+                                            v-validate.initial="groupProductData.des_grupo_producto"
+                                            v-model="groupProductData.des_grupo_producto"
+                                            :disabled="formType == 'view'">
+                                    <p class="text-danger" v-if="errors.has('groupProductData.des_grupo_producto')">Grupo Producto es requerido</p>
                                 </div>
-                            </div>
-                             <div class="form-group col-md-12">
+                            </div>                  
+
+                             <div class="form-group col-md-12" :class="{'has-error': errors.has('groupProductData.cod_grupo_producto')}">
                                 <label class="control-label col-sm-4" for="email">Código:</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control input-sm" id="pwd">
+                                    <input  type="text" class="form-control input-sm"
+                                            data-vv-rules="required"
+                                            v-validate.initial="groupProductData.cod_grupo_producto"
+                                            v-model="groupProductData.cod_grupo_producto"
+                                            :disabled="formType == 'view'">
+                                    <p class="text-danger" v-if="errors.has('groupProductData.cod_grupo_producto')">Código es requerido</p>
                                 </div>
                             </div>
-                             <div class="form-group col-md-12">
+                             <div class="form-group col-md-12" :class="{'has-error': errors.has('groupProductData.id_color')}">
                                 <label class="control-label col-sm-4" for="email">Color:</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control input-sm" id="pwd">
+                                    <select name="" class="form-control input-sm" data-vv-rules="required" v-validate.initial="groupProductData.id_color" v-model="groupProductData.id_color" :disabled="formType == 'view'">
+                                        <option value="" v-for="color in colors" v-bind:value="color.id_color">
+                                            {{color.des_color}}
+                                        </option>
+                                    </select>
+                                    <p class="text-danger" v-if="errors.has('groupProductData.id_color')">Color es requerido</p>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
-                <div class="row">                  
+                <div class="row" v-if="formType == 'view'">
                     <div class="col-md-12">
                         <table class="table table-striped table-bordered table-condensed">
                         <thead>
                             <tr>
-                            <th>Producto</th>
+                            <th>Productos</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>test2</td>
+                            <tr v-for="product in groupProductData.product">
+                                <td v-if="product.lang[0].description">{{product.lang[0].description}}</td>
                             </tr>
                         </tbody>
                         </table>
                     </div>
                 </div>
+                <div class="cont" v-if="formType == 'new' || formType == 'edit' ">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <input
+                            v-model ="filterProduct"
+                            type="text"
+                            class="form-control input-sm"
+                            placeholder="Buscar producto...">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <table class="table table-striped table-bordered table-condensed">
+                            <thead>
+                                <tr>
+                                <th></th>
+                                <th>Producto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                              <tr v-for ="product in products">
+                                    <td align="center">
+                                        <label>
+                                            <input
+                                                v-bind:value="product"
+                                                type="checkbox"
+                                                v-model="leftProductsSelected">
+                                        </label>
+                                    </td>
+                                    <td v-if="product.lang[0].description">{{product.lang[0].description}}</td>
+                                </tr>
+                            </tbody>                            
+                            </table>
+                        </div>
+                        <div class="col-md-2 add-product">
+                            <a @click="addProductsSelected()">
+                                <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                            </a>
+                        </div>
+                        <div class="col-md-5">
+                            <table class="table table-striped table-bordered table-condensed">
+                            <thead>
+                                <tr>
+                                <th>Producto</th>
+                                <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(product,index) in groupProductData.product">
+                                    <td v-if="product.lang[0].description">{{product.lang[0].description}}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm"@click="removeProduct(index)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div slot="modal-footer" class="modal-footer">          
-            <button type="button" class="btn btn-danger" @click="saveOrUpdateSchool()">Guardar</button>
-            <button type="button" class="btn btn-primary" @click="closeViewModal()">Cancelar</button>        
+            <button v-if="formType == 'edit' || formType == 'new'" type="button" class="btn btn-danger" @click="saveOrUpdateProductGroup()">Guardar</button>
+            <button type="button" class="btn btn-primary" @click="closeModal()">
+                <span v-if="formType == 'edit' || formType == 'new'">Cancelar</span>
+                <span v-if="formType == 'view'">Cerrar</span>
+            </button>
         </div>
     </modal>
   </div>
 </template>
 
 <style>
-
+    .add-product{
+        padding-top: 8%;
+    }
+    .add-product a{        
+        background-color: transparent;
+        border: none;
+    }
+    .add-product span{
+        font-size: 60px;
+        color: red;
+        cursor:pointer;
+    }
+    .pagination{
+        cursor: pointer;
+    }
+    .add-product span:hover{
+        color: #A50000;
+    }
+    .add-product span:active{
+        color: #7A0000;
+    }
 </style>
 
 <script>
@@ -244,19 +258,33 @@
         data(){
            return {
                 showSpinner : false,
-                modalNewIsOpen : false,
-                viewModalIsOpen : false,
+                modalIsOpen : false,
                 productGroups : [],
                 currentPage : 1,
                 sizeData : 10,
+                filterProduct : '',
                 searchParam : null,
-                totalPages : 0
+                totalPages : 0,
+                groupProductData : {
+                    id_grupo_producto :  null,
+                    product : [],
+                    product_groups_id : []
+                },
+                leftProductsSelected : [],
+                colors :{},
+                products : {},
+                formType : ''
            }
         },
         created(){
             this.searchProductGroups()
+            this.getColors()
+            this.getProducts()
         },
         methods : {
+          validateBeforeSubmit(){
+              this.$validator.validateAll();
+          },
           searchProductGroups(){
             this.showSpinner = true
             this.$http.get("api/search-product-group/"+this.searchParam+"?size="+this.sizeData+"&page="+this.currentPage)
@@ -266,17 +294,19 @@
                   this.totalPages = response.body.last_page
               })
           },  
-          openNewModal() {
-              this.modalNewIsOpen = true
+          openModal(type) {
+              this.formType = type
+              this.modalIsOpen = true
           },
           closeModal(){
-              this.modalNewIsOpen = false
-          },
-         openViewModal() {
-              this.viewModalIsOpen = true
-          },
-         closeViewModal(){
-              this.viewModalIsOpen = false
+              this.formType = ''
+              this.modalIsOpen = false,
+              this.leftProductsSelected = []
+              this.groupProductData = {
+                    product : [],
+                    id_grupo_producto :  null,
+                    product_groups_id : []
+                }
           },
          getNumber(num){
             return new Array(num);
@@ -286,8 +316,93 @@
                 this.currentPage = page
                 this.searchProductGroups()
              }             
-         }         
-        },
+         },
+         getProducts(){
+             this.$http.get("api/product").then((response)=>{
+                 this.products = response.body
+             });
+         },
+         getColors(){
+             this.$http.get("api/color").then((response)=>{
+                 this.colors = response.body
+             });
+         },
+         findProductGroup(id){
+             this.$http.get("api/product-group/"+id).then((response)=>{
+                 this.groupProductData = response.body                 
+             });
+         },
+         addProductsSelected(){
+             this.leftProductsSelected.forEach(function(element) {
+                 var exists = []
+                 if(this.groupProductData.product.length>0){
+                     exists = this.groupProductData.product.filter(function(felem){
+                        if(felem.id_product == element.id_product){
+                            return felem
+                        }
+                    })
+                 }
+                 if(exists.length==0){
+                     this.groupProductData.product.push(element)                 
+                 }                 
+             }, this)             
+         },
+         removeProduct(index){
+            this.groupProductData.product.splice(index, 1)
+         },
+         saveOrUpdateProductGroup(){
+             this.$validator.validateAll().then((res)=>{
+                  if(res == true){
+                    if(this.formType=='new'){
+                        this.saveProductGroup()
+                    }
+                    else if(this.formType == 'edit'){
+                        this.updateProductGroup()
+                    }
+                 }
+             })
+         },
+         saveProductGroup(){
+              this.$http.post("api/product-group",this.groupProductData).then(()=>{
+                    this.searchProductGroups()
+                    swal({
+                        position: 'top-right',
+                        type: 'success',
+                        title: 'Guardado exitosamente',
+                        showConfirmButton: false,
+                        timer: 1700                        
+                    }).then(()=>{
+                        this.closeModal()
+                    })                    
+                },(error)=>{
+                    swal(
+                        'Oops...',
+                        'Hubo un error al guardar',
+                        'error'
+                    )                    
+                })
+         },
+         updateProductGroup(){
+            this.$http.put("api/product-group/"+this.groupProductData.id_grupo_producto,this.groupProductData).then((response)=>{
+                    this.searchProductGroups()
+                    swal({
+                        position: 'top-right',
+                        type: 'success',
+                        title: 'Guardado exitosamente',
+                        showConfirmButton: false,
+                        timer: 1500,                        
+                    }).then( ()=>{
+                            this.closeModal()
+                        })
+                }, (error) =>{
+                    swal(
+                        'Oops...',
+                        'Hubo un error al guardar',
+                        'error'
+                    )
+                })
+         }        
+        },        
         watch : {
             sizeData: function(){
                 this.currentPage = 1
