@@ -146,7 +146,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="product in groupProductData.product">
-                                <td v-if="product.lang[0].description">{{product.lang[0].description}}</td>
+                                <td>{{product.description}}</td>
                             </tr>
                         </tbody>
                         </table>
@@ -182,7 +182,7 @@
                                                 v-model="leftProductsSelected">
                                         </label>
                                     </td>
-                                    <td v-if="product.lang[0].description">{{product.lang[0].description}}</td>
+                                    <td >{{product.description}}</td>
                                 </tr>
                             </tbody>                            
                             </table>
@@ -202,7 +202,7 @@
                             </thead>
                             <tbody>
                                 <tr v-for="(product,index) in groupProductData.product">
-                                    <td v-if="product.lang[0].description">{{product.lang[0].description}}</td>
+                                    <td>{{product.description}}</td>
                                     <td>
                                         <button class="btn btn-danger btn-sm"@click="removeProduct(index)">Eliminar</button>
                                     </td>
@@ -247,6 +247,9 @@
     .add-product span:active{
         color: #7A0000;
     }
+    .table tbody{
+       font-size: 12px;
+    }
 </style>
 
 <script>
@@ -262,7 +265,7 @@
                 productGroups : [],
                 currentPage : 1,
                 sizeData : 10,
-                filterProduct : '',
+                filterProduct : null,
                 searchParam : null,
                 totalPages : 0,
                 groupProductData : {
@@ -318,7 +321,7 @@
              }             
          },
          getProducts(){
-             this.$http.get("api/product").then((response)=>{
+             this.$http.get("api/search-product/"+this.filterProduct).then((response)=>{
                  this.products = response.body
              });
          },
@@ -345,7 +348,8 @@
                  if(exists.length==0){
                      this.groupProductData.product.push(element)                 
                  }                 
-             }, this)             
+             }, this)
+             this.leftProductsSelected = []             
          },
          removeProduct(index){
             this.groupProductData.product.splice(index, 1)
@@ -413,6 +417,12 @@
                     this.searchParam = null
                 }
                 this.searchProductGroups()
+            },
+            filterProduct: function(){
+                if(this.filterProduct == ''){
+                    this.filterProduct =  null
+                }
+                this.getProducts()
             }
         },
         components :{
