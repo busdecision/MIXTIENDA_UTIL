@@ -9,9 +9,12 @@
               <router-link tag="li" to="/colegio" v-if="isAuth!=null">
                 <a>Colegio</a>
               </router-link>
+              <router-link tag="li" to="/grupo-producto" v-if="isAuth!=null">
+                <a>Grupo-producto</a>
+              </router-link>
           </ul>
         </nav>
-        <h3 class="text-muted">Ecomerce</h3>        
+        <h3 class="text-muted">E-Commerce</h3>        
       </div>      
 </template>
 

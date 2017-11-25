@@ -1,5 +1,5 @@
 <template>
-  <div class="school-content">
+  <div class="school-content container">
       <div class="row main-title">
         <h3 align="center">Lista de colegios</h3>
         <hr>
@@ -47,7 +47,7 @@
       -->   
 
     <modal :show.sync="modalNewIsOpen" effect="fade" width="400">
-      <div slot="modal-header" class="modal-header">
+      <div slot="modal-header" class="modal-header" align="center">
         <h4 class="modal-title">
         Registro de Colegio
         </h4>
@@ -57,11 +57,10 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-horizontal">
-                        <div class="form-group" :class="{'has-error': errors.has('schooldata.id_colegio')}">
+                        <div class="form-group">
                             <label class="control-label col-sm-4">ID:</label>
                             <div class="col-sm-8">
-                                <input v-validate.initial="schooldata.id_colegio"  data-vv-rules="required" :disabled="formType=='view' || formType=='edit'" type="number" v-model ="schooldata.id_colegio" class="form-control input-sm" >
-                                <p class="text-danger" v-if="errors.has('schooldata.id_colegio')">ID es requerido</p>
+                                <input :disabled="true" type="number" v-model ="schooldata.id_colegio" class="form-control input-sm" >
                             </div>
                         </div>
                         <div class="form-group" :class="{'has-error': errors.has('schooldata.des_colegio') }">
@@ -111,7 +110,7 @@
                                         <option value=""></option>  
                                         <option v-bind:value="district.id_distrito" v-for="district in districts">{{district.des_distrito}}</option>
                                     </select>
-                                    <p class="text-danger" v-if="errors.has('schooldata.id_colegio')">Distrito es requerido</p>
+                                    <p class="text-danger" v-if="errors.has('schooldata.id_distrito')">Distrito es requerido</p>
                             </div>                           
                         </div>
                     </div>
@@ -196,8 +195,7 @@
           },          
           depSelected : null,
           provSelected : null,
-          formType: '',
-          formSubmitted: false,
+          formType: '',          
           existSchoolName: false,
           checkNameSpinner: false,
           canUseName: false,
@@ -238,9 +236,6 @@
         validateBeforeSubmit(){
             this.$validator.validateAll();
         },
-        submitForm(){
-            this.formSubmitted = true
-        },
           allSchools(){
               this.showSpinner = true
             this.$http.get("api/school")
@@ -277,10 +272,7 @@
               .then(response=>{
                   this.schoolGrades = response.body
               })
-          },
-          openModal() {
-              this.modalIsOpen = true
-          },          
+          },         
           openNewModal() {
               this.modalNewIsOpen = true
           },
@@ -288,6 +280,8 @@
             this.modalIsOpen = false
             this.modalNewIsOpen = false
             this.schooldata = {}
+            this.depSelected = null
+            this.provSelected = null
           },          
           getSchool(id){
             this.$http.get("api/school/"+id).then((response)=>{
@@ -359,7 +353,7 @@
                         type: 'success',
                         title: 'Guardado exitosamente',
                         showConfirmButton: false,
-                        timer: 1500                        
+                        timer: 1700                        
                     }).then(()=>{
                         this.closeModal()
                     })
