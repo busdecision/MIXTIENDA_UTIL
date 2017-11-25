@@ -4,6 +4,7 @@ import Login from './components/pages/authentication/Login.vue'
 import Register from './components/pages/authentication/Register.vue'
 import Dashboard from './components/pages/dashboard/Dashboard.vue'
 import School from './components/pages/school/School.vue'
+import GrupoProducto from './components/pages/grupoProducto/GrupoProducto.vue'
 
 Vue.use(VueRouter)
 
@@ -33,6 +34,13 @@ const router = new VueRouter({
         {
             path : "/colegio",
             component: School,
+            meta:{
+                forAuth: true
+            }
+        },        
+        {
+            path : "/grupo-producto",
+            component: GrupoProducto,
             meta:{
                 forAuth: true
             }
