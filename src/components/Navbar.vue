@@ -12,6 +12,9 @@
               <router-link tag="li" to="/grupo-producto" v-if="isAuth!=null">
                 <a>Grupo-producto</a>
               </router-link>
+              <router-link tag="li" to="/utiles" v-if="isAuth!=null">
+                <a>Lista-utiles</a>
+              </router-link>
           </ul>
         </nav>
         <h3 class="text-muted">E-Commerce</h3>        
@@ -26,7 +29,6 @@
       }
     },
     created(){
-      console.log("sdsds")
       this.isAuth = this.$auth.isAuthenticated()
     },
   }

@@ -26,6 +26,7 @@
     </div>
 </template>
 <script>
+import config from '../../../../config.json'
     export default{
         data(){
             return {
@@ -36,8 +37,8 @@
         methods:{
             login(){
                 var data ={
-                    	client_id: 2,
-	                    client_secret : "u1E6kIB7FSV2W2CPJGYptVApo8Prs4EzxTjEl8sH",
+                    	client_id: config.clientId,
+	                    client_secret : config.clientSecret,
 	                    grant_type :  "password",
 	                    username: this.email,
 	                    password: this.password
