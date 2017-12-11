@@ -4,7 +4,7 @@ import Router from './routes.js'
 
 import VueResource from 'vue-resource'
 import Auth from './packages/auth/auth.js'
-import VeeValidate from 'vee-validate';
+import VeeValidate from 'vee-validate'
 import config from '../config.json'
 
 Vue.use(VueResource)

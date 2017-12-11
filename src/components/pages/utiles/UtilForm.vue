@@ -57,12 +57,16 @@
           <form class="form-horizontal">
             <div class="form-group">
               <label class="control-label col-sm-2">Grupo producto:</label>
-              <div class="col-sm-4">
-                <input v-model="tempProductGroup.grupo_producto" type="text" class="form-control input-sm" placeholder="Buscar">
+              <div class="col-sm-6">
+                <v-select                  
+                  :options="productGroupList"        
+                  label="des_grupo_producto"
+                  :on-change="productSelected"
+                ></v-select>
               </div>
-              <label class="control-label col-sm-2">Cantidad:</label>
+              <label class="control-label col-sm-1">Cantidad:</label>
               <div class="col-sm-2">
-                <input v-model="tempProductGroup.cantidad" type="number" class="form-control input-sm" >
+                <input v-model="tempProductGroup.cantidad" type="number" class="form-control input-sm"  min="0">
               </div>
             </div>
             <div class="form-group">
@@ -89,7 +93,7 @@
                 <tbody>
                   <tr v-for="(product, index) in utilData.grupo_producto">
                     <td >
-                      {{product.grupo_producto}}
+                      {{product.des_grupo_producto}}
                     </td>
                     <td>
                       {{product.detalle}}
@@ -105,38 +109,50 @@
                 </tbody>
               </table>
       </div>
-      <pre>{{utilData}}</pre>
-      <pre>{{tempProductGroup}}</pre>
         <hr>
         <div class="row" align="center">
           <button class="btn btn-primary" @click="saveUtil()">Guardar</button>
           <button class="btn btn-danger">Cancelar</button>
         </div>
-      </div>
-
+      </div>      
     </div>
   </div>
 </template>
 <script>
+import vueSelect from 'vue-select'
+
   export default{
     data(){
       return {
+        syncedVal: null,
         schools : {},
-        schoolGrades : {},
+        schoolGrades : [],
         parameter : {},
+        productGroupList:[],
         utilData: {
           periodo : 0,
           grupo_producto : []
         },
-        tempProductGroup : {}
+        tempProductGroup : {
+          id_grupo_producto : null
+        }
       }
     },
     created(){
       this.getSchools()
       this.getSchoolGrades()
       this.getParameter(1)
+      this.getProductGroup()
     },
     methods : {
+    productSelected(item){
+      this.tempProductGroup = item
+    },
+    getProductGroup(){
+      this.$http.get("api/product-group").then(response=>{
+        this.productGroupList = response.body
+      })
+    },
     getSchools(){
       this.$http.get("api/school").then(response=>{
         this.schools = response.body
@@ -153,7 +169,7 @@
       })
     },
     addProduct(){
-      if(this.tempProductGroup.grupo_producto){
+      if(this.tempProductGroup.des_grupo_producto){
         this.utilData.grupo_producto.push(this.tempProductGroup)
         this.tempProductGroup = {}
       }
@@ -163,9 +179,12 @@
     },
     saveUtil(){
       this.$http.post("api/util", this.utilData).then(response=>{
-                
+
       })
     }
+    },
+    components :{
+      'v-select' : vueSelect
     }
   }
 </script>
