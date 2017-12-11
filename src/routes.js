@@ -6,8 +6,7 @@ import Dashboard from './components/pages/dashboard/Dashboard.vue'
 import School from './components/pages/school/School.vue'
 import GrupoProducto from './components/pages/grupoProducto/GrupoProducto.vue'
 import ListaUtiles from './components/pages/utiles/Utiles.vue'
-import CrearUtil from './components/pages/utiles/CreateUtil.vue'
-import EditarUtil from './components/pages/utiles/EditUtil.vue'
+import utilForm from './components/pages/utiles/UtilForm.vue'
 
 Vue.use(VueRouter)
 
@@ -57,14 +56,22 @@ const router = new VueRouter({
         },        
         {
             path : "/utiles/crear",
-            component: CrearUtil,
+            component: utilForm,
+            props: { type : 'new' },
+            meta:{
+                forAuth: true
+            }
+        },                
+        {
+            path : "/utiles/:id/editar",
+            component: utilForm,
             meta:{
                 forAuth: true
             }
         },
         {
-            path : "/utiles/:id/editar",
-            component: EditarUtil,
+            path : "/utiles/:id",
+            component: utilForm,
             meta:{
                 forAuth: true
             }
