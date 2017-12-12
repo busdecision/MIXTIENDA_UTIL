@@ -1,22 +1,23 @@
 <template>
   <div>    
     <div class="container panel panel-default">
-      <div class="panel-body">        
-              <div class="row" align="center">
-        <h4>Registrar Lista de Útiles</h4>
-        </br>
-      </div>
+      <div class="panel-body" @submit.prevent="validateBeforeSubmit">
+        <div class="row" align="center">
+          <h4>Registrar Lista de Útiles</h4>
+          </br>
+        </div>
       <div class="row">
         <form class="form-horizontal">
           <div class="form-group">
             <label class="control-label col-sm-2">Colegio:</label>
-            <div class="col-sm-8">
-              <select v-model="utilData.id_colegio" name="" id="" class="form-control input-sm">
+            <div class="col-sm-8" :class="{'has-error': errors.has('utilData.id_colegio')}">
+              <select v-model="utilData.id_colegio" class="form-control input-sm" data-vv-rules="required" v-validate.initial="utilData.id_colegio">
                 <option value=""></option>
                 <option value="" v-for="school in schools" v-bind:value="school.id_colegio">
                   {{school.des_colegio}}
                 </option>
               </select>
+              <p class="text-danger" v-if="errors.has('utilData.id_colegio')">Colegio es requerido</p>
             </div>
             <div class="col-sm-2">
               <button class="btn btn-success btn-sm">Nuevo</button>
@@ -24,13 +25,14 @@
           </div>
           <div class="form-group">
             <label class="control-label col-sm-2" for="pwd">Grado:</label>
-            <div class="col-sm-8"> 
-              <select v-model="utilData.id_grado_escolar" name="" id="" class="form-control input-sm">
+            <div class="col-sm-8" :class="{'has-error': errors.has('utilData.id_grado_escolar')}"> 
+              <select v-model="utilData.id_grado_escolar" class="form-control input-sm" data-vv-rules="required" v-validate.initial="utilData.id_grado_escolar">
                 <option value=""></option>
                 <option value="" v-for="grade in schoolGrades" v-bind:value="grade.id_grado_escolar">
                   {{grade.des_grado_escolar}}
                 </option>
               </select>
+              <p class="text-danger" v-if="errors.has('utilData.id_grado_escolar')">Grado es requerido</p>
             </div>
             <div class="col-sm-2">
               <button class="btn btn-success btn-sm">Nuevo</button>
@@ -38,17 +40,20 @@
           </div>
           <div class="form-group">
             <label class="control-label col-sm-2" for="pwd">Periodo:</label>
-            <div class="col-sm-4"> 
+            <div class="col-sm-4">
               <input v-model="utilData.periodo" type="text" class="form-control input-sm" :disabled="true">
+              <span class="label label-success" v-if="verifyParam == true">Periodo disponible</span>
+              <span class="label label-danger" v-if="verifyParam == false">Periodo ya registrado</span>
             </div>
             <div class="col-sm-4">
-              <button class="btn btn-danger btn-sm">Verificar</button>
+              <button class="btn btn-danger btn-sm" type="button" @click="verifyPeriod()">Verificar</button>
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" :class="{'has-error': errors.has('utilData.id_lista_archivo')}">
             <label class="control-label col-sm-2" for="pwd">Cod Lista:</label>
             <div class="col-sm-8"> 
-              <input v-model="utilData.id_lista_archivo" type="text" class="form-control input-sm">
+              <input v-model="utilData.id_lista_archivo" type="text" class="form-control input-sm" data-vv-rules="required" v-validate.initial="utilData.id_lista_archivo">
+              <p class="text-danger" v-if="errors.has('utilData.id_lista_archivo')">Código es requerido</p>
             </div>            
           </div>
         </form>
@@ -118,12 +123,20 @@
     </div>
   </div>
 </template>
+<style>
+body, .panel, .form-control{
+  /*background-color: black;*/
+}
+</style>
+
 <script>
 import vueSelect from 'vue-select'
+import swal from 'sweetalert2'
 
   export default{
     data(){
       return {
+        verifyParam : null,
         syncedVal: null,
         schools : {},
         schoolGrades : [],
@@ -134,6 +147,7 @@ import vueSelect from 'vue-select'
           grupo_producto : []
         },
         tempProductGroup : {
+          cantidad : 0,
           id_grupo_producto : null
         }
       }
@@ -145,6 +159,19 @@ import vueSelect from 'vue-select'
       this.getProductGroup()
     },
     methods : {
+    validateBeforeSubmit(){
+        this.$validator.validateAll();
+    },
+    verifyPeriod(){
+      this.$http.post("api/verify-period",
+          {
+            id_colegio: this.utilData.id_colegio,
+            id_grado_escolar: this.utilData.id_grado_escolar,
+            period : this.utilData.periodo
+            }).then(response=>{
+        this.verifyParam = response.body.result
+      })      
+    },
     productSelected(item){
       this.tempProductGroup = item
     },
@@ -178,9 +205,28 @@ import vueSelect from 'vue-select'
         this.utilData.grupo_producto.splice(index, 1)
     },
     saveUtil(){
-      this.$http.post("api/util", this.utilData).then(response=>{
-
-      })
+      this.$validator.validateAll().then((res)=>{
+        if(res){
+                this.$http.post("api/util", this.utilData).then(response=>{
+            swal({
+                position: 'top-right',
+                type: 'success',
+                title: 'Guardado exitosamente',
+                showConfirmButton: false,
+                timer: 1700                        
+            }).then(()=>{
+                
+            })
+          }, (error)=>{
+              var message = error.body.errors ? error.body.errors : 'Hubo un error al guardar'
+                  swal(
+                      'Oops...',
+                      message,
+                      'error'
+                  )
+          })
+        }        
+      });
     }
     },
     components :{
