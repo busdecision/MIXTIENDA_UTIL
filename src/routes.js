@@ -57,8 +57,8 @@ const router = new VueRouter({
         {
             path : "/utiles/crear",
             component: utilForm,
-            props: { type : 'new' },
             meta:{
+                type : "new",
                 forAuth: true
             }
         },                
@@ -66,6 +66,7 @@ const router = new VueRouter({
             path : "/utiles/:id/editar",
             component: utilForm,
             meta:{
+                type : "edit",
                 forAuth: true
             }
         },
@@ -73,6 +74,7 @@ const router = new VueRouter({
             path : "/utiles/:id",
             component: utilForm,
             meta:{
+                type : "view",
                 forAuth: true
             }
         }
