@@ -121,7 +121,6 @@
           <button class="btn btn-primary" @click="saveUtil()"  v-if="utilFormType != 'view' ">Guardar</button>
           <button class="btn btn-danger">Cancelar</button>
         </div>
-        <pre>{{utilData}}</pre>
       </div>      
     </div>
   </div>
@@ -213,7 +212,7 @@ import swal from 'sweetalert2'
       })
     },
     addProduct(){
-      if(this.tempProductGroup.des_grupo_producto){
+      if(this.tempProductGroup.des_grupo_producto && this.tempProductGroup.cantidad && this.tempProductGroup.des_detalle){
         this.utilData.grupo_producto.push(this.tempProductGroup)
         this.tempProductGroup = {}
       }
@@ -254,7 +253,25 @@ import swal from 'sweetalert2'
           })
     },
     updateU(){
-      console.log("updating")
+      this.$http.put("api/util/"+this.$route.params.id, this.utilData).then(response=>{
+            console.log(response)
+            swal({
+                position: 'top-right',
+                type: 'success',
+                title: 'Guardado exitosamente',
+                showConfirmButton: false,
+                timer: 1700                        
+            }).then(()=>{
+                
+            })
+          }, (error)=>{
+              var message = error.body.errors ? error.body.errors : 'Hubo un error al guardar'
+                  swal(
+                      'Oops...',
+                      message,
+                      'error'
+                  )
+          })
     }
     },
     components :{
