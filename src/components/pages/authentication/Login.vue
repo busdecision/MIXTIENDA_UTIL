@@ -27,6 +27,8 @@
 </template>
 <script>
 import config from '../../../../config.json'
+import swal from 'sweetalert2'
+
     export default{
         data(){
             return {
@@ -47,6 +49,12 @@ import config from '../../../../config.json'
                     .then(response=>{
                         this.$auth.setToken(response.body.access_token, response.body.expires_in + Date.now())
                         this.$router.push("/colegio")
+                    }, (err)=>{                        
+                        swal(
+                        'Invalido',
+                        'Credenciales invalidas',
+                        'error'
+                        )                    
                     })
             }
         }
