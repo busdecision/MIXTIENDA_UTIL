@@ -4,7 +4,41 @@
         <h3 align="center">Lista de Útiles</h3>
         <hr>
       </div>
+        <div class="row">
+          <div class="col-md-4">
+            <router-link tag="li" to="/utiles/crear" class="btn btn-success" >
+                Nuevo
+              </router-link>		  			
+		  		</div>
+        </div>
+        </br>
+
       <div class="row">
+            <div class="col-md-4">
+              <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-1">Ver</label>
+                        <div class="col-sm-5">                                
+                            <select class="form-control input-sm" v-model="sizeData">                                      
+                                <option v-bind:value="10">10</option>
+                                <option v-bind:value="25">25</option>
+                                <option v-bind:value="50">50</option>
+                            </select>                               
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="control-label">registros</label>
+                        </div>
+                    </div>
+              </div>
+            </div>
+            <div class="col-md-8">
+  					<input
+                  v-model="searchParam"
+                  type="text"
+                  class="form-control input-sm"
+                  placeholder="Buscar...">
+            </div>
+        <!--
 		  		<div class="col-md-4">
             <router-link tag="li" to="/utiles/crear" class="btn btn-success" >
                 Nuevo
@@ -17,6 +51,7 @@
                         class="form-control input-sm"
                         placeholder="Buscar...">
 		  		</div>
+          -->
 	    </div>
       <br>    
       <div class="row">
@@ -81,6 +116,7 @@
 export default{
   data(){
     return {
+      sizeData : 10,
       currentPage : 1,
       searchParam : null,
       showSpinner: false,
@@ -93,10 +129,10 @@ export default{
   },
   methods : {
     searchUtil(){      
-        this.$http.post("api/search-utiles/"+this.searchParam+"?size="+10+"&page="+this.currentPage)
+        this.$http.post("api/search-utiles/"+this.searchParam+"?size="+this.sizeData+"&page="+this.currentPage)
         .then(response=>{
           this.utilData = response.body.data
-          this.totalPages = response.body.last_page
+          this.totalPages = response.body.last_page          
         })      
     },
     getNumber(num){
@@ -110,6 +146,10 @@ export default{
     }
   },
   watch : {
+    sizeData: function(){
+        this.currentPage = 1
+        this.searchUtil()
+    },
     searchParam : function(){
       if(this.searchParam == ''){                    
           this.searchParam = null

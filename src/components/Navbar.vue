@@ -17,8 +17,11 @@
               <router-link tag="li" to="/utiles" v-if="isAuth!=null">
                 <a>Lista-utiles</a>
               </router-link>
-          </ul>
-        </nav>
+              <router-link tag="li" to="/usuario/crear" v-if="isAuth!=null">
+                <a>Usuarios</a>
+              </router-link>              
+          </ul>                      
+        </nav>        
         <h3 class="text-muted">E-Commerce</h3>        
       </div>      
 </template>
@@ -33,6 +36,9 @@
     created(){
       this.isAuth = this.$auth.isAuthenticated()
     },
+      components :{
+
+    }
   }
 </script>
 

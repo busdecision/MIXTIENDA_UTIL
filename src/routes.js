@@ -7,6 +7,7 @@ import School from './components/pages/school/School.vue'
 import GrupoProducto from './components/pages/grupoProducto/GrupoProducto.vue'
 import ListaUtiles from './components/pages/utiles/Utiles.vue'
 import utilForm from './components/pages/utiles/UtilForm.vue'
+import User from './components/pages/user/User.vue'
 
 Vue.use(VueRouter)
 
@@ -77,7 +78,14 @@ const router = new VueRouter({
                 type : "view",
                 forAuth: true
             }
-        }
+        },
+        {
+            path : "/usuario/crear",
+            component: User,
+            meta:{
+                forAuth: true
+            }
+        }    
     ],
     linkActiveClass: 'active',
     mode : 'history'
