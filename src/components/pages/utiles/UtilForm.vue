@@ -13,7 +13,7 @@
           <div class="form-group">
             <label class="control-label col-sm-2">Colegio:</label>
             <div class="col-sm-8" :class="{'has-error': errors.has('utilData.id_colegio')}">
-              <select @change="verifyPeriod()" v-model="utilData.id_colegio" class="form-control input-sm" data-vv-rules="required" v-validate.initial="utilData.id_colegio" :disabled="utilFormType == 'view' || utilFormType == 'edit'">
+              <select @change="verifyPeriod(); getGrades()" v-model="utilData.id_colegio" class="form-control input-sm" data-vv-rules="required" v-validate.initial="utilData.id_colegio" :disabled="utilFormType == 'view'">
                 <option value=""></option>
                 <option value="" v-for="school in schools" v-bind:value="school.id_colegio">
                   {{school.des_colegio}}
@@ -21,14 +21,18 @@
               </select>
               <p class="text-danger" v-if="errors.has('utilData.id_colegio')">Colegio es requerido</p>
             </div>
-            <div class="col-sm-2">
-              <button type="button" class="btn btn-success btn-sm" v-if="utilFormType != 'view' " @click="openSchoolModal()">Nuevo</button>
+            <div class="col-sm-1">
+              <a href="/colegio" target="_blank" class="btn btn-success btn-sm" v-if="utilFormType != 'view' ">Nuevo</a>
             </div>
+            <div class="col-sm-1">
+              <button class="btn btn-info btn-sm" @click="getSchools()" v-if="utilFormType != 'view' "><span class="glyphicon glyphicon-refresh"></span></button>
+            </div>
+            
           </div>
           <div class="form-group">
             <label class="control-label col-sm-2" for="pwd">Grado:</label>
             <div class="col-sm-8" :class="{'has-error': errors.has('utilData.id_grado_escolar')}"> 
-              <select @change="verifyPeriod()" v-model="utilData.id_grado_escolar" class="form-control input-sm" data-vv-rules="required" v-validate.initial="utilData.id_grado_escolar" :disabled="utilFormType == 'view' || utilFormType == 'edit'">
+              <select @change="verifyPeriod()" v-model="utilData.id_grado_escolar" class="form-control input-sm" data-vv-rules="required" v-validate.initial="utilData.id_grado_escolar" :disabled="utilFormType == 'view'">
                 <option value=""></option>
                 <option value="" v-for="grade in schoolGrades" v-bind:value="grade.id_grado_escolar">
                   {{grade.des_grado_escolar}}
@@ -36,9 +40,11 @@
               </select>
               <p class="text-danger" v-if="errors.has('utilData.id_grado_escolar')">Grado es requerido</p>
             </div>
+            <!--
             <div class="col-sm-2">
               <button class="btn btn-success btn-sm" v-if="utilFormType != 'view' ">Nuevo</button>
             </div>
+            -->
           </div>
           <div class="form-group">
             <label class="control-label col-sm-2" for="pwd">Periodo:</label>
@@ -81,7 +87,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="control-label col-sm-2" for="email">Des detalle:</label>
+              <label class="control-label col-sm-2" for="email">Referencia:</label>
               <div class="col-sm-6">
                 <input v-model="tempProductGroup.des_detalle" type="text" class="form-control input-sm">
               </div>              
@@ -123,120 +129,10 @@
         <hr>
         <div class="row" align="center">
           <button class="btn btn-primary" @click="saveUtil()"  v-if="utilFormType != 'view' ">Guardar</button>
-          <button class="btn btn-danger">Cancelar</button>
+          <button class="btn btn-danger" @click="cancel()">Cancelar</button>
         </div>
       </div>      
     </div>
-
-    <!-- school modal -->
-    <modal :show.sync="schoolModal" effect="fade" width="400">
-      <div slot="modal-header" class="modal-header" align="center">
-        <h4 class="modal-title">
-        Registro de Colegio
-        </h4>
-      </div>
-      <div slot="modal-body" class="modal-body">
-          <div @submit.prevent="validateBeforeSubmitSchool" class="my-form">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-horizontal">
-                        <div class="form-group">
-                            <label class="control-label col-sm-4">ID:</label>
-                            <div class="col-sm-8">
-                                <input :disabled="true" type="number" v-model ="schooldata.id_colegio" class="form-control input-sm" >
-                            </div>
-                        </div>
-                        <div class="form-group" :class="{'has-error': errors.has('schooldata.des_colegio') }">
-                            <label class="control-label col-sm-4" >Colegio:</label>
-                            <div class="col-sm-8">
-                                <input v-validate.initial="schooldata.des_colegio" @change="existsSchoolName()" data-vv-rules="required" type="text" v-model ="schooldata.des_colegio" class="form-control input-sm">
-                                <p class="text-danger" v-if="errors.has('schooldata.des_colegio')">Nombre es requerido</p>
-                                <vue-simple-spinner v-if="checkNameSpinner" size="small" message="Validando Nombre..." :speed="0.4"></vue-simple-spinner>                                
-                                <span v-if="canUseName" class="label label-success">Nombre validado</span>
-                                <span v-if="existSchoolName" class="label label-danger">Este nombre ya existe</span>
-                            </div>
-                        </div>                    
-                        <div class="form-group">
-                            <label class="control-label col-sm-4" >Observacion:</label>
-                            <div class="col-sm-8">
-                                <textarea class="form-control input-sm" rows="5" v-model ="schooldata.observacion"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-horizontal">
-                        <div class="form-group" :class="{'has-error': errors.has('depSelected')}">
-                            <label class="control-label col-sm-4">Departamento:</label>                        
-                            <div class="col-sm-8">
-                                    <select v-validate.initial="depSelected"  data-vv-rules="required" class="form-control input-sm" v-model="depSelected">
-                                        <option value=""></option>  
-                                        <option v-bind:value="department.id_departamento" v-for="department in departments">{{department.des_departamento}}</option>
-                                    </select>
-                                    <p class="text-danger" v-if="errors.has('depSelected')">Departamento es requerido</p>
-                            </div>
-                        </div>
-                        <div class="form-group" :class="{'has-error': errors.has('provSelected')}">
-                            <label class="control-label col-sm-4" >Provincia:</label>
-                            <div class="col-sm-8">
-                                    <select v-validate.initial="provSelected"  data-vv-rules="required" class="form-control input-sm" v-model="provSelected" :disabled="depSelected == '' || depSelected == null">
-                                        <option value=""></option>  
-                                        <option v-bind:value="province.id_provincia" v-for="province in provincies">{{province.des_provincia}}</option>
-                                    </select>
-                                    <p class="text-danger" v-if="errors.has('provSelected')">Provincia es requerida</p>
-                            </div>
-                        </div>                    
-                        <div class="form-group" :class="{'has-error': errors.has('schooldata.id_distrito')}">
-                            <label class="control-label col-sm-4" >Distrito:</label>
-                            <div class="col-sm-8">                            
-                                    <select v-validate.initial="schooldata.id_distrito"  data-vv-rules="required" class="form-control input-sm" v-model="schooldata.id_distrito" :disabled="provSelected =='' || provSelected == null ">
-                                        <option value=""></option>  
-                                        <option v-bind:value="district.id_distrito" v-for="district in districts">{{district.des_distrito}}</option>
-                                    </select>
-                                    <p class="text-danger" v-if="errors.has('schooldata.id_distrito')">Distrito es requerido</p>
-                            </div>                           
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <label>Seleccione:</label>
-                <table class="table table-striped table-bordered table-condensed">
-                    <thead>
-                        <tr>
-                        <th></th>
-                        <th>Grado Escolar</th>
-                        <th>Nivel</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="grade in schoolGrades">
-                            <td align="center">
-                                <label>
-                                    <input
-                                        v-bind:value="grade.id_grado_escolar"
-                                        type="checkbox"
-                                        v-model="schooldata.school_grades_id"
-                                        >
-                                </label>
-                            </td>
-                            <td>{{grade.des_grado_escolar}}</td>
-                            <td>{{grade.nivel_grado_escolar}}</td>
-                        </tr>
-                    </tbody>
-                    </table>
-                </div>
-            </div>
-          </div>
-      </div>
-      <div slot="modal-footer" class="modal-footer">          
-        <button type="button" class="btn btn-danger" @click="saveSchool()">Guardar</button>
-        <button type="button" class="btn btn-primary" @click="closeSchoolModal()">Cancelar</button>        
-      </div>
-    </modal>
-    <!-- fin school modal-->
-
   </div>
 </template>
 <style>
@@ -246,25 +142,12 @@ body, .panel, .form-control{
 </style>
 
 <script>
-import VueStrap from 'vue-strap'
 import vueSelect from 'vue-select'
 import swal from 'sweetalert2'
 
   export default{
     data(){
       return {
-        //schoolModal
-        schoolModal : false,
-        canUseName: false,
-        schooldata : {},
-        checkNameSpinner : false,
-        existSchoolName: false,
-        depSelected : null,
-        provSelected : null,
-        provincies: [],
-        departments: [],
-        districts: [],
-
         utilFormType: null,
         verifyParam : null,
         syncedVal: null,
@@ -290,21 +173,15 @@ import swal from 'sweetalert2'
       this.getProductGroup()      
     },
     methods : {
-    openSchoolModal(){
-      this.schoolModal = true
-    },
-    closeSchoolModal(){
-      this.schoolModal = false
-    },
     searchProductGroups(q, loading){
-      loading(true)
-      console.log("searching" + q)
-      this.$http.get("api/search-product-group/"+q)
+      if(q.length>=3){
+        loading(true)      
+        this.$http.get("api/search-product-group/"+q)
         .then(response=>{
           this.productGroupList = response.body.data
-          console.log(this.productGroupList)
           loading(false)
         })
+      }
     },
     initform(){
       this.utilFormType = this.$route.meta.type
@@ -317,7 +194,6 @@ import swal from 'sweetalert2'
         this.$validator.validateAll()
     },
     validateBeforeSubmitSchool(){
-      console.log(this.$validator)
       this.$validator.validateAll()
     },
     verifyPeriod(){
@@ -348,12 +224,24 @@ import swal from 'sweetalert2'
     getSchools(){
       this.$http.get("api/school").then(response=>{
         this.schools = response.body
+        this.getGrades()
+        //console.log(this.schools)
       })
     },
+    getGrades(){
+      this.schools.filter((elem)=>{        
+        if(elem.id_colegio == this.utilData.id_colegio){
+          this.schoolGrades = elem.school_grades
+          
+        }
+        })
+    },
     getSchoolGrades(){
+      /*
       this.$http.get("api/school-grade").then(response=>{
-        this.schoolGrades = response.body
+        //this.schoolGrades = response.body
       })
+      */
     },
     getParameter(id){
       this.$http.get("api/parameter/"+id).then(response=>{
@@ -361,7 +249,7 @@ import swal from 'sweetalert2'
       })
     },
     addProduct(){
-      if(this.tempProductGroup.des_grupo_producto && this.tempProductGroup.cantidad && this.tempProductGroup.des_detalle){
+      if(this.tempProductGroup.des_grupo_producto && this.tempProductGroup.cantidad>0 && this.tempProductGroup.des_detalle){
         this.utilData.grupo_producto.push(this.tempProductGroup)
         this.tempProductGroup = {}
       }
@@ -369,19 +257,28 @@ import swal from 'sweetalert2'
     removeProduct(index){
         this.utilData.grupo_producto.splice(index, 1)
     },
-    saveUtil(){
+    saveUtil(){      
       this.$validator.validateAll().then((res)=>{
-        if(res){
-          if(this.utilFormType == "new"){
-            this.saveU()
+          if(res){
+            if(this.utilData.grupo_producto.length>0){
+              if(this.utilFormType == "new"){
+                this.saveU()
+              }
+              else if(this.utilFormType == "edit"){
+                this.updateU()
+              }
+            }
+            else{              
+              swal( 'Oops...', 'Añada por lo menos un grupo producto','error')
+            }
           }
-          else if(this.utilFormType == "edit"){
-            this.updateU()
-          }
-        }        
       });
     },
+    cancel(){      
+      this.$router.push("/utiles")
+    },
     saveU(){
+      
           this.$http.post("api/util", this.utilData).then(response=>{
             swal({
                 position: 'top-right',
@@ -390,7 +287,7 @@ import swal from 'sweetalert2'
                 showConfirmButton: false,
                 timer: 1700                        
             }).then(()=>{
-                
+                this.$router.push("/utiles")
             })
           }, (error)=>{
               var message = error.body.errors ? error.body.errors : 'Hubo un error al guardar'
@@ -403,7 +300,6 @@ import swal from 'sweetalert2'
     },
     updateU(){
       this.$http.put("api/util/"+this.$route.params.id, this.utilData).then(response=>{
-            console.log(response)
             swal({
                 position: 'top-right',
                 type: 'success',
@@ -411,7 +307,7 @@ import swal from 'sweetalert2'
                 showConfirmButton: false,
                 timer: 1700                        
             }).then(()=>{
-                
+                this.$router.push("/utiles")
             })
           }, (error)=>{
               var message = error.body.errors ? error.body.errors : 'Hubo un error al guardar'
@@ -427,8 +323,7 @@ import swal from 'sweetalert2'
 
     },
     components :{
-      'v-select' : vueSelect,
-      'modal' : VueStrap.modal,
+      'v-select' : vueSelect
     }
   }
 </script>

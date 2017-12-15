@@ -38,20 +38,6 @@
                   class="form-control input-sm"
                   placeholder="Buscar...">
             </div>
-        <!--
-		  		<div class="col-md-4">
-            <router-link tag="li" to="/utiles/crear" class="btn btn-success" >
-                Nuevo
-              </router-link>		  			
-		  		</div>
-		  		<div class="col-md-8">
-					<input
-                        v-model="searchParam"
-                        type="text"
-                        class="form-control input-sm"
-                        placeholder="Buscar...">
-		  		</div>
-          -->
 	    </div>
       <br>    
       <div class="row">
@@ -113,6 +99,7 @@
 </style>
 
 <script>
+import Spinner from 'vue-simple-spinner'
 export default{
   data(){
     return {
@@ -128,11 +115,13 @@ export default{
     this.searchUtil()
   },
   methods : {
-    searchUtil(){      
+    searchUtil(){
+      this.showSpinner = true
         this.$http.post("api/search-utiles/"+this.searchParam+"?size="+this.sizeData+"&page="+this.currentPage)
         .then(response=>{
           this.utilData = response.body.data
-          this.totalPages = response.body.last_page          
+          this.totalPages = response.body.last_page
+          this.showSpinner = false
         })      
     },
     getNumber(num){
@@ -156,6 +145,9 @@ export default{
       }
       this.searchUtil()      
     }
+  },
+  components :{
+    'vue-simple-spinner': Spinner
   }
 }  
 </script>

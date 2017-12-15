@@ -8,18 +8,23 @@
                 <a>Dashboard</a>
               </router-link>
               -->
-              <router-link tag="li" to="/colegio" v-if="isAuth!=null">
+              <router-link tag="li" to="/colegio" v-if="isAuth">
                 <a>Colegio</a>
               </router-link>
-              <router-link tag="li" to="/grupo-producto" v-if="isAuth!=null">
+              <router-link tag="li" to="/grupo-producto" v-if="isAuth">
                 <a>Grupo-producto</a>
               </router-link>
-              <router-link tag="li" to="/utiles" v-if="isAuth!=null">
+              <router-link tag="li" to="/utiles" v-if="isAuth">
                 <a>Lista-utiles</a>
               </router-link>
+              <a style="margin-left:4px" tag="li" to="/utiles" class="btn btn-default" @click="cerrarSession()" v-if="isAuth">
+                Cerrar session
+              </a>
+              <!--
               <router-link tag="li" to="/usuario/crear" v-if="isAuth!=null">
                 <a>Usuarios</a>
-              </router-link>              
+              </router-link>
+              -->
           </ul>                      
         </nav>        
         <h3 class="text-muted">E-Commerce</h3>        
@@ -34,7 +39,16 @@
       }
     },
     created(){
-      this.isAuth = this.$auth.isAuthenticated()
+      this.getAuth()
+    },
+    methods:{
+      getAuth(){
+        this.isAuth = this.$auth.isAuthenticated()
+      },
+      cerrarSession(){
+        this.$auth.destroyToken()
+        this.$router.go("/login")
+      }
     },
       components :{
 

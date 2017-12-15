@@ -1,8 +1,10 @@
 <template>
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
-            <div class="panel panel-default">
+            <div class="panel panel-default"> 
                 <div class="panel-body">
+                    <h4 align="center">Acceso al Sistema</h4>
+                    <hr>
                     <div class="form-group">
                         <input 
                             v-model="email"
@@ -18,7 +20,7 @@
                             placeholder="Password">
                     </div>
                     <button @click="login()" class="btn btn-success pull-right">
-                        Login
+                        Iniciar Sesión
                     </button>
                 </div>
             </div>
@@ -48,7 +50,7 @@ import swal from 'sweetalert2'
                 this.$http.post("oauth/token", data)
                     .then(response=>{
                         this.$auth.setToken(response.body.access_token, response.body.expires_in + Date.now())
-                        this.$router.push("/colegio")
+                        this.$router.go("/colegio")
                     }, (err)=>{                        
                         swal(
                         'Invalido',
