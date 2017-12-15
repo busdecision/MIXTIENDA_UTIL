@@ -416,7 +416,7 @@
       },
       components :{
          'alert': VueStrap.alert,
-         'modal' : VueStrap.modal,
+         'modal' : VueStrap.modal,     
          'vue-simple-spinner': Spinner
       }
     }
