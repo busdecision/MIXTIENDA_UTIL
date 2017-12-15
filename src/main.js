@@ -4,13 +4,14 @@ import Router from './routes.js'
 
 import VueResource from 'vue-resource'
 import Auth from './packages/auth/auth.js'
-import VeeValidate from 'vee-validate';
+import VeeValidate from 'vee-validate'
+import config from '../config.json'
 
 Vue.use(VueResource)
 Vue.use(Auth)
 Vue.use(VeeValidate)
 
-Vue.http.options.root = 'http://127.0.0.1:8000'
+Vue.http.options.root = config.apiUrl
 
 Vue.http.interceptors.push((request, next) => {
   request.headers.set('Authorization', 'Bearer ' + Vue.auth.getToken())
