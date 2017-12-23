@@ -17,6 +17,9 @@
               <router-link tag="li" to="/utiles" v-if="isAuth">
                 <a>Lista-utiles</a>
               </router-link>
+              <router-link tag="li" to="/archivo" v-if="isAuth">
+                <a>Lista-archivo</a>
+              </router-link>
               <a style="margin-left:4px" tag="li" to="/utiles" class="btn btn-default" @click="cerrarSession()" v-if="isAuth">
                 Cerrar session
               </a>
