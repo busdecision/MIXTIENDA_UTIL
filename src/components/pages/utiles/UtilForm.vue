@@ -60,7 +60,7 @@
           <div class="form-group" :class="{'has-error': errors.has('utilData.id_lista_archivo')}">
             <label class="control-label col-sm-2" for="pwd">Cod Lista:</label>
             <div class="col-sm-8"> 
-              <input v-model="utilData.id_lista_archivo" type="text" class="form-control input-sm" data-vv-rules="required" v-validate.initial="utilData.id_lista_archivo" :disabled="utilFormType == 'view'">
+              <input v-model="utilData.id_lista_archivo" type="text" class="form-control input-sm" data-vv-rules="required" v-validate.initial="utilData.id_lista_archivo" :disabled="true">
               <p class="text-danger" v-if="errors.has('utilData.id_lista_archivo')">Código es requerido</p>
             </div>            
           </div>
@@ -81,7 +81,7 @@
                   >
                   </v-select>
               </div>
-              <label class="control-label col-sm-1">Cantidad:</label>
+              <label class="control-label col-sm-1 cant">Cantidad:</label>
               <div class="col-sm-2">
                 <input v-model="tempProductGroup.cantidad" type="number" class="form-control input-sm"  min="0">
               </div>
@@ -139,6 +139,9 @@
 body, .panel, .form-control{
   /*background-color: black;*/
 }
+.cant{
+    margin-right: 20px;
+}
 </style>
 
 <script>
@@ -160,7 +163,7 @@ import swal from 'sweetalert2'
           grupo_producto : []
         },
         tempProductGroup : {
-          cantidad : 0,
+          cantidad : 1,
           id_grupo_producto : null
         }
       }
@@ -183,8 +186,11 @@ import swal from 'sweetalert2'
         })
       }
     },
-    initform(){
+    initform(){      
       this.utilFormType = this.$route.meta.type
+      if(this.$route.query.listaArchivoId){
+        this.utilData.id_lista_archivo = this.$route.query.listaArchivoId
+      }      
       if(this.utilFormType == "edit" || this.utilFormType == "view"){
         var id = this.$route.params.id
         this.getUtil(id)
@@ -215,6 +221,7 @@ import swal from 'sweetalert2'
     },
     productSelected(item){
       this.tempProductGroup = item
+      this.tempProductGroup.cantidad = 1
     },
     getProductGroup(){
       this.$http.get("api/product-group").then(response=>{
@@ -252,6 +259,13 @@ import swal from 'sweetalert2'
       if(this.tempProductGroup.des_grupo_producto && this.tempProductGroup.cantidad>0 && this.tempProductGroup.des_detalle){
         this.utilData.grupo_producto.push(this.tempProductGroup)
         this.tempProductGroup = {}
+      }
+      else{
+          swal(
+              'Oops...',
+              'Complete todos los campos del grupo producto',
+              'error'
+          )
       }
     },
     removeProduct(index){

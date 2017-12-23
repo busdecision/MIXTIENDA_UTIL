@@ -423,7 +423,8 @@
                     this.filterProduct =  null
                 }
                 this.getProducts()
-            }
+            },
+            
         },
         components :{
          'alert': VueStrap.alert,

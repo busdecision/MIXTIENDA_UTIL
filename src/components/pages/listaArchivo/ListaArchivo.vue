@@ -1,18 +1,9 @@
 <template>
-  <div>
-      <div class="row main-title">
-        <h3 align="center">Lista de Útiles</h3>
+  <div>      
+      <div class="row main-title" align="center">
+        <h3>Lista archivo</h3>
         <hr>
       </div>
-        <div class="row">
-          <div class="col-md-4">
-            <router-link tag="li" to="/utiles/crear" class="btn btn-success" >
-                Nuevo
-              </router-link>		  			
-		  		</div>
-        </div>
-        </br>
-
       <div class="row">
             <div class="col-md-4">
               <div class="form-horizontal">
@@ -33,39 +24,35 @@
             </div>
             <div class="col-md-8">
   					<input
-                  v-model="searchParam"
                   type="text"
                   class="form-control input-sm"
                   placeholder="Buscar...">
             </div>
 	    </div>
-      <br>    
       <div class="row">
         <table class="table table-striped table-bordered table-condensed">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Colegio</th>
-              <th>Nivel</th>
-              <th>Grado</th>
-              <th>Código Lista</th>
+              <th>estado</th>             
               <th>Acción</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="util in utilData">
-              <td>{{util.id_colegio}}</td>
-              <td>{{util.des_colegio}}</td>
-              <td>{{util.des_grado_escolar}}</td>
-              <td>{{util.nivel_grado_escolar}}</td>
-              <td>{{util.id_lista_archivo}}</td>              
-              <td>
-              <router-link :to="'/utiles/'+util.id_lista" class="btn btn-info btn-sm link-button">
-                <a>Ver</a>
-              </router-link>
-              <router-link :to="'/utiles/'+util.id_lista+'/editar'" class="btn btn-primary btn-sm link-button">
-                <a>Editar</a>
-              </router-link>
+            <tr v-for="archivo in archivoData">
+              <td>{{archivo.id_lista_archivo}}</td>
+              <td>{{archivo.estado.des_estado_archivo}}</td>                      
+              <td align="center">              
+                <a :href="archivo.ruta_archivo" class="btn btn-info btn-sm link-button" target="_blank">
+                  <a>Descargar</a>
+                </a>
+                <!--
+                  <router-link :to="'/utiles/'+archivo.id_lista_archivo+'/editar'" class="btn btn-primary btn-sm link-button">
+                  -->
+                <router-link :to="{ path: '/utiles/crear?listaArchivoId='+archivo.id_lista_archivo}" class="btn btn-primary btn-sm link-button">
+                  <a>Registrar</a>
+                </router-link>
+                
             </td>
             </tr>
           </tbody>
@@ -92,19 +79,16 @@
       </div>
   </div>
 </template>
+
 <style>
-    .pagination{
-        cursor: pointer;
-    }
     .link-button a{
       text-decoration: none;
       color:white;
     }
 </style>
-
 <script>
 import Spinner from 'vue-simple-spinner'
-export default{
+  export default{
   data(){
     return {
       sizeData : 10,
@@ -112,21 +96,21 @@ export default{
       searchParam : null,
       showSpinner: false,
       totalPages : 0,
-      utilData : {}
+      archivoData : {}
     }
   },
   created(){
-    this.searchUtil()
+    this.searchArchivo()
   },
   methods : {
-    searchUtil(){
+    searchArchivo(){
       this.showSpinner = true
-        this.$http.post("api/search-utiles/"+this.searchParam+"?size="+this.sizeData+"&page="+this.currentPage)
+        this.$http.post("api/search-archivo/"+this.searchParam+"?size="+this.sizeData+"&page="+this.currentPage)
         .then(response=>{
-          this.utilData = response.body.data
+          this.archivoData = response.body.data
           this.totalPages = response.body.last_page
           this.showSpinner = false
-        })      
+        }) 
     },
     getNumber(num){
       return new Array(num);
@@ -134,24 +118,18 @@ export default{
     changePage(page){
       if(page != 0 && page <= this.totalPages){
         this.currentPage = page
-        this.searchUtil()
+        this.searchArchivo()
       }
-    }
+    }  
   },
-  watch : {
+  watch:{
     sizeData: function(){
         this.currentPage = 1
-        this.searchUtil()
+        this.searchArchivo()
     },
-    searchParam : function(){
-      if(this.searchParam == ''){                    
-          this.searchParam = null
-      }
-      this.searchUtil()      
-    }
   },
   components :{
     'vue-simple-spinner': Spinner
   }
-}  
+  }
 </script>
