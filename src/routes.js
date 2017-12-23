@@ -8,6 +8,7 @@ import GrupoProducto from './components/pages/grupoProducto/GrupoProducto.vue'
 import ListaUtiles from './components/pages/utiles/Utiles.vue'
 import utilForm from './components/pages/utiles/UtilForm.vue'
 import User from './components/pages/user/User.vue'
+import ListaArchivo from './components/pages/listaArchivo/ListaArchivo.vue'
 
 Vue.use(VueRouter)
 
@@ -60,7 +61,11 @@ const router = new VueRouter({
             component: utilForm,
             meta:{
                 type : "new",
-                forAuth: true
+                forAuth: true,
+                listaArchivoId: null
+            },
+            params:{
+                listaArchivoId: null
             }
         },                
         {
@@ -83,8 +88,12 @@ const router = new VueRouter({
             path : "/usuario/crear",
             component: User,
             meta:{
-                forAuth: true
+                forAuth: true                
             }
+        },
+        {
+            path : "/archivo",
+            component: ListaArchivo            
         }    
     ],
     linkActiveClass: 'active',
