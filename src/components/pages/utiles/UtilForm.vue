@@ -42,10 +42,10 @@
             </div>
             <div class="col-sm-1" v-if="utilData.id_colegio">
               <router-link :to="'/colegio/'+utilData.id_colegio+'/editar'" target="_blank" class="btn btn-success btn-sm link-button">
-                <a >Nuevo</a>
+                <a >Añadir</a>
               </router-link>              
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-1" v-if="utilData.id_colegio">
               <button class="btn btn-info btn-sm" @click="getSchools()" v-if="utilFormType != 'view' "><span class="glyphicon glyphicon-refresh"></span></button>
             </div>
             <!--

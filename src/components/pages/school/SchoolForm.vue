@@ -5,10 +5,10 @@
                     <div class="row">
                         <!--<div :show.sync="modalNewIsOpen" :on-close="closeModal" effect="fade" width="400" @showchange="updateShowDialog">-->
                     <div align="center">
-                        <h3 class="modal-title">
+                        <h4 class="modal-title">
                             <span v-if="formType == 'new' ">Registro de Colegio</span>
                             <span v-if="formType == 'edit' ">Actualizar Colegio</span>
-                        </h3>
+                        </h4>
                     </div>
                     <hr>
                     <br>
@@ -132,6 +132,9 @@ div.table-container {
       overflow-x: hidden;
       overflow-y: auto;
       margin-top: -20px;
+}
+table {
+    font-size: 12px;
 }
 </style>
 
