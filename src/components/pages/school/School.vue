@@ -156,31 +156,35 @@
             <div class="row">
                 <div class="col-md-12">
                     <label>Seleccione:</label>
-                <table class="table table-striped table-bordered table-condensed">
-                    <thead>
-                        <tr>
-                        <th></th>
-                        <th>Grado Escolar</th>
-                        <th>Nivel</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="grade in schoolGrades">
-                            <td align="center">
-                                <label>
-                                    <input
-                                        :disabled="formType=='view'"
-                                        v-bind:value="grade.id_grado_escolar"
-                                        type="checkbox"
-                                        v-model="schooldata.school_grades_id"
-                                        >
-                                </label>
-                            </td>
-                            <td>{{grade.des_grado_escolar}}</td>
-                            <td>{{grade.nivel_grado_escolar}}</td>
-                        </tr>
-                    </tbody>
+                    <table class="table table-striped table-bordered table-condensed">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Grado Escolar</th>
+                                <th>Nivel</th>
+                            </tr>
+                        </thead>
                     </table>
+                    <div class="table-container">
+                        <table class="table table-striped table-bordered table-condensed">
+                            <tbody>
+                                <tr v-for="grade in schoolGrades">
+                                    <td align="center">
+                                        <label>
+                                            <input
+                                                :disabled="formType=='view'"
+                                                v-bind:value="grade.id_grado_escolar"
+                                                type="checkbox"
+                                                v-model="schooldata.school_grades_id"
+                                                >
+                                        </label>
+                                    </td>
+                                    <td>{{grade.des_grado_escolar}}</td>
+                                    <td>{{grade.nivel_grado_escolar}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
           </div>

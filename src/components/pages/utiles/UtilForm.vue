@@ -106,33 +106,37 @@
           </form>
       </div>
       <div class="row">
-              <table class="table table-striped table-bordered table-condensed">
-                <thead>
-                  <tr>
-                    <th>Grupo Producto</th>
-                    <th>Des detalle</th>
-                    <th>Cantidad</th> 
-                    <th v-if="utilFormType != 'view' ">Acción</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <table class="table table-striped table-condensed">
+            <thead>
+              <tr>
+                  <th class="col-xs-3">Grupo Producto</th>
+                  <th class="col-xs-3">Des detalle</th>
+                  <th class="col-xs-3">Cantidad</th> 
+                  <th v-if="utilFormType != 'view' " class="col-xs-3">Acción</th>
+              </tr>
+            </thead>
+          </table>
+          <div class="table-container">
+            <table class="table table-striped table-condensed">
+              <tbody>
                   <tr v-for="(product, index) in utilData.grupo_producto">
-                    <td >
+                    <td class="col-xs-3">
                       {{product.des_grupo_producto}}
                     </td>
-                    <td>
+                    <td class="col-xs-3">
                       {{product.des_detalle}}
                     </td>
-                    <td>
+                    <td class="col-xs-3">
                       {{product.cantidad}}
                     </td>
-                    <td v-if="utilFormType != 'view' ">
+                    <td v-if="utilFormType != 'view' " class="col-xs-3">
                       <button class="btn btn-danger btn-sm" @click="removeProduct(index)">Eliminar</button>
                     </td>
                   </td>
                   </tr>
-                </tbody>
-              </table>
+              </tbody>
+            </table>
+          </div>
       </div>
         <hr>
         <div class="row" align="center">
@@ -154,6 +158,13 @@ body, .panel, .form-control{
   .link-button a{
     text-decoration: none;
     color:white;
+  }
+
+  div.table-container {
+      height: 300px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      margin-top: -20px;
   }
 </style>
 
@@ -269,18 +280,34 @@ import swal from 'sweetalert2'
       })
     },
     addProduct(){
+      var check  = []
+      check = this.utilData.grupo_producto.filter((felem)=>{
+          if(felem.cod_grupo_producto == this.tempProductGroup.cod_grupo_producto){
+              return felem
+          }
+      })
+      
       if(this.tempProductGroup.des_grupo_producto && this.tempProductGroup.cantidad>0 && this.tempProductGroup.des_detalle){
-        this.utilData.grupo_producto.push(this.tempProductGroup)
-        this.tempProductGroup = {}
-      }
-      else{
-          swal(
-              'Oops...',
-              'Complete todos los campos del grupo producto',
-              'error'
-          )
-      }
-    },
+            if(check.length== 0){
+              this.utilData.grupo_producto.push(this.tempProductGroup)
+            }
+            else{
+                swal(
+                'Oops...',
+                'El grupo producto ya ha sido añadido',
+                'error'
+                )
+            }
+        }
+        else{                    
+            swal(
+                'Oops...',
+                'Complete todos los campos del grupo producto',
+                'error'
+            )
+        }      
+    }
+    ,
     removeProduct(index){
         this.utilData.grupo_producto.splice(index, 1)
     },

@@ -6,9 +6,7 @@
       </div>
         <div class="row">
           <div class="col-md-4">
-            <router-link tag="li" to="/utiles/crear" class="btn btn-success" >
-                Nuevo
-              </router-link>		  			
+         			
 		  		</div>
         </div>
         </br>
