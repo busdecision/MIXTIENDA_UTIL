@@ -120,6 +120,9 @@ export default{
   },
   methods : {
     searchUtil(){
+      if(!this.searchParam){
+          this.searchParam = null
+      }
       this.showSpinner = true
         this.$http.post("api/search-utiles/"+this.searchParam+"?size="+this.sizeData+"&page="+this.currentPage)
         .then(response=>{
@@ -144,10 +147,10 @@ export default{
         this.searchUtil()
     },
     searchParam : function(){
-      if(this.searchParam == ''){                    
-          this.searchParam = null
-      }
-      this.searchUtil()      
+      var validateSrch = !this.searchParam ? '' : this.searchParam;
+      if(validateSrch.length>=3 || validateSrch == ''){
+        this.searchUtil()
+      }      
     }
   },
   components :{

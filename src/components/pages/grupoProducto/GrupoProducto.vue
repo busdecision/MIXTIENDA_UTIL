@@ -289,6 +289,9 @@
               this.$validator.validateAll();
           },
           searchProductGroups(){
+            if(!this.searchParam){
+                this.searchParam = null
+            }
             this.showSpinner = true
             this.$http.get("api/search-product-group/"+this.searchParam+"?size="+this.sizeData+"&page="+this.currentPage)
               .then(response=>{
@@ -413,10 +416,10 @@
                 this.searchProductGroups()
             },
             searchParam: function(){
-                if(this.searchParam == ''){                    
-                    this.searchParam = null
-                }
-                this.searchProductGroups()
+                var validateSrch = !this.searchParam ? '' : this.searchParam;
+                if(validateSrch.length>=3 || validateSrch == ''){
+                    this.searchProductGroups()
+                }                
             },
             filterProduct: function(){
                 if(this.filterProduct == ''){

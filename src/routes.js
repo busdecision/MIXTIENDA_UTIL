@@ -4,6 +4,7 @@ import Login from './components/pages/authentication/Login.vue'
 import Register from './components/pages/authentication/Register.vue'
 import Dashboard from './components/pages/dashboard/Dashboard.vue'
 import School from './components/pages/school/School.vue'
+import SchoolForm from './components/pages/school/SchoolForm.vue'
 import GrupoProducto from './components/pages/grupoProducto/GrupoProducto.vue'
 import ListaUtiles from './components/pages/utiles/Utiles.vue'
 import utilForm from './components/pages/utiles/UtilForm.vue'
@@ -13,7 +14,7 @@ import ListaArchivo from './components/pages/listaArchivo/ListaArchivo.vue'
 Vue.use(VueRouter)
 
 const router = new VueRouter({
-    routes :[
+    routes :[        
         {
             path :"/login",
             component: Login,
@@ -41,7 +42,23 @@ const router = new VueRouter({
             meta:{
                 forAuth: true
             }
-        },        
+        },
+        {
+            path : "/colegio/crear",
+            component: SchoolForm,
+            meta:{
+                forAuth: true,
+                type : "create"
+            }
+        },
+        {
+            path : "/colegio/:id/editar",
+            component: SchoolForm,
+            meta:{
+                forAuth: true,
+                type : "edit"
+            }
+        },
         {
             path : "/grupo-producto",
             component: GrupoProducto,
@@ -93,7 +110,10 @@ const router = new VueRouter({
         },
         {
             path : "/archivo",
-            component: ListaArchivo            
+            component: ListaArchivo,
+            meta:{
+                forAuth: true                
+            }
         }    
     ],
     linkActiveClass: 'active',

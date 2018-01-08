@@ -22,7 +22,7 @@
               <p class="text-danger" v-if="errors.has('utilData.id_colegio')">Colegio es requerido</p>
             </div>
             <div class="col-sm-1">
-              <a href="/colegio" target="_blank" class="btn btn-success btn-sm" v-if="utilFormType != 'view' ">Nuevo</a>
+              <a href="/colegio/crear" target="_blank" class="btn btn-success btn-sm" v-if="utilFormType != 'view' ">Nuevo</a>
             </div>
             <div class="col-sm-1">
               <button class="btn btn-info btn-sm" @click="getSchools()" v-if="utilFormType != 'view' "><span class="glyphicon glyphicon-refresh"></span></button>
@@ -39,6 +39,14 @@
                 </option>
               </select>
               <p class="text-danger" v-if="errors.has('utilData.id_grado_escolar')">Grado es requerido</p>
+            </div>
+            <div class="col-sm-1" v-if="utilData.id_colegio">
+              <router-link :to="'/colegio/'+utilData.id_colegio+'/editar'" target="_blank" class="btn btn-success btn-sm link-button">
+                <a >Nuevo</a>
+              </router-link>              
+            </div>
+            <div class="col-sm-1">
+              <button class="btn btn-info btn-sm" @click="getSchools()" v-if="utilFormType != 'view' "><span class="glyphicon glyphicon-refresh"></span></button>
             </div>
             <!--
             <div class="col-sm-2">
@@ -142,6 +150,11 @@ body, .panel, .form-control{
 .cant{
     margin-right: 20px;
 }
+
+  .link-button a{
+    text-decoration: none;
+    color:white;
+  }
 </style>
 
 <script>

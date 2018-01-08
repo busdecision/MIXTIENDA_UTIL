@@ -11,7 +11,10 @@ import Navbar from './components/Navbar.vue'
 
 export default{
   created(){
-    //this.$router.push("/login")
+    //this.$router.push("/login"
+    if(this.$route.path == "/"){
+      this.$router.push("/login")
+    }
   },
   components: {
     'navbar' : Navbar   
