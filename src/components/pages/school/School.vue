@@ -82,7 +82,7 @@
       </div>
       </div>
 
-    <modal :show.sync="modalNewIsOpen" effect="fade" width="400">
+    <modal :show.sync="modalNewIsOpen" effect="fade" width="400" :backdrop="false">
         <!--<modal :show.sync="modalNewIsOpen" :on-close="closeModal" effect="fade" width="400" @showchange="updateShowDialog">-->
       <div slot="modal-header" class="modal-header" align="center">
         <h4 class="modal-title">

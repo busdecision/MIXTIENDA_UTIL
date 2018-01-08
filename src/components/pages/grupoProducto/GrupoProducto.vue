@@ -82,7 +82,7 @@
                 </li>
             </ul>
       </div>
-    <modal :show.sync="modalIsOpen" effect="fade" width="400">
+    <modal :show.sync="modalIsOpen" effect="fade" width="400" :backdrop="false">
         <div slot="modal-header" class="modal-header" align="center">
             <h4 class="modal-title" v-if="formType == 'new'">Registrar Grupo Poducto</h4>
             <h4 class="modal-title" v-if="formType == 'edit'">Editar Grupo Poducto</h4>
