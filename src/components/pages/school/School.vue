@@ -4,18 +4,40 @@
         <h3 align="center">Lista de colegios</h3>
         <hr>
       </div>
-      <div class="row">
-		  		<div class="col-md-4">
-		  			<button class="btn btn-success" @click="openNewModal(); changeFormType('new')">Nuevo</button>
-		  		</div>
-		  		<div class="col-md-8">
-					<input
-                        v-model="searchParam"
-                        type="text"
-                        class="form-control input-sm"
-                        placeholder="Buscar...">
-		  		</div>
-	    </div>
+        <div class="row">
+            <div class="col-md-12">
+                <router-link :to="'/colegio/crear'" class="btn btn-success btn-sm link-button">
+                        <a>Nuevo</a>
+                </router-link>
+            </div>
+        </div>
+        </br>
+        <div class="row">
+            <div class="col-md-4">
+                  <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-1">Ver</label>
+                            <div class="col-sm-5">                                
+                                <select class="form-control input-sm" v-model="sizeData">                                      
+                                    <option v-bind:value="10">10</option>
+                                    <option v-bind:value="25">25</option>
+                                    <option v-bind:value="50">50</option>
+                                </select>                               
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="control-label">registros</label>
+                            </div>
+                        </div>
+                  </div>
+            </div>
+            <div class="col-md-8">
+                <input
+                    v-model="searchParam"
+                    type="text"
+                    class="form-control input-sm"
+                    placeholder="Buscar...">
+            </div>
+        </div>
       <br>    
       <div class="row">
         <table class="table table-striped table-bordered table-condensed">
@@ -32,21 +54,36 @@
               <td>{{school.des_colegio}}</td>
               <td>
                 <button class="btn btn-info btn-sm" @click="openNewModal(); getSchool(school.id_colegio); changeFormType('view')">Ver</button>
-                <button class="btn btn-primary btn-sm"@click="openNewModal(); getSchool(school.id_colegio); changeFormType('edit')">Editar</button>
+                <router-link :to="'/colegio/'+school.id_colegio+'/editar'" class="btn btn-primary btn-sm link-button">
+                    <a>Editar</a>
+                </router-link>
             </td>
             </tr>
           </tbody>
-        </table>
-         <vue-simple-spinner v-if="showSpinner" size="large" message="Cargando..." :speed="0.4"></vue-simple-spinner>
+        </table>        
+         <vue-simple-spinner v-if="showSpinner" size="large" message="Cargando..." :speed="0.4"></vue-simple-spinner>         
          <hr>        
+        <div class="row" align="center">
+            <ul class="pagination">
+                 <li>
+                    <a v-on:click="changePage(currentPage-1)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li v-for="(item, index) in getNumber(totalPages)" v-bind:class="{ active:  (index+1 == currentPage)}">
+                    <a @click="changePage(index+1)">{{index+1}}</a>
+                </li>
+                <li>
+                    <a v-on:click="changePage(currentPage+1)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
       </div>
-      <!--
-      <alert :show.sync="modalIsOpen" type="info">
-        <b>Info</b>
-      </alert>
-      -->   
+      </div>
 
-    <modal :show.sync="modalNewIsOpen" effect="fade" width="400">
+    <modal :show.sync="modalNewIsOpen" effect="fade" width="400" :backdrop="false">
+        <!--<modal :show.sync="modalNewIsOpen" :on-close="closeModal" effect="fade" width="400" @showchange="updateShowDialog">-->
       <div slot="modal-header" class="modal-header" align="center">
         <h4 class="modal-title">
         Registro de Colegio
@@ -119,31 +156,35 @@
             <div class="row">
                 <div class="col-md-12">
                     <label>Seleccione:</label>
-                <table class="table table-striped table-bordered table-condensed">
-                    <thead>
-                        <tr>
-                        <th></th>
-                        <th>Grado Escolar</th>
-                        <th>Nivel</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="grade in schoolGrades">
-                            <td align="center">
-                                <label>
-                                    <input
-                                        :disabled="formType=='view'"
-                                        v-bind:value="grade.id_grado_escolar"
-                                        type="checkbox"
-                                        v-model="schooldata.school_grades_id"
-                                        >
-                                </label>
-                            </td>
-                            <td>{{grade.des_grado_escolar}}</td>
-                            <td>{{grade.nivel_grado_escolar}}</td>
-                        </tr>
-                    </tbody>
+                    <table class="table table-striped table-bordered table-condensed">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Grado Escolar</th>
+                                <th>Nivel</th>
+                            </tr>
+                        </thead>
                     </table>
+                    <div class="table-container">
+                        <table class="table table-striped table-bordered table-condensed">
+                            <tbody>
+                                <tr v-for="grade in schoolGrades">
+                                    <td align="center">
+                                        <label>
+                                            <input
+                                                :disabled="formType=='view'"
+                                                v-bind:value="grade.id_grado_escolar"
+                                                type="checkbox"
+                                                v-model="schooldata.school_grades_id"
+                                                >
+                                        </label>
+                                    </td>
+                                    <td>{{grade.des_grado_escolar}}</td>
+                                    <td>{{grade.nivel_grado_escolar}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
           </div>
@@ -169,7 +210,10 @@
    .table tbody{
        font-size: 12px;
    }
-  
+   .link-button a{
+      text-decoration: none;
+      color:white;
+    }
 </style>
 <script>
     import VueStrap from 'vue-strap'
@@ -179,6 +223,9 @@
     export default{
       data(){
         return{
+          totalPages : 0,
+          currentPage : 1,
+          sizeData : 10,
           showSpinner : false,
           schools: [],
           provincies: [],
@@ -187,8 +234,7 @@
           districts: [],
           searchParam : null,          
           modalIsOpen: false,
-          modalNewIsOpen: false,
-          searchParam : null,
+          modalNewIsOpen: false,          
           schooldata :{
               school_grades_id : [],
               id_distrito: null
@@ -203,7 +249,8 @@
         }
       },
       created(){
-            this.allSchools()
+            //this.allSchools()
+            this.searchSchool()
             this.allDistricts()
             this.allPronvicies()
             this.allDepartments()
@@ -238,10 +285,11 @@
         },
           allSchools(){
               this.showSpinner = true
-            this.$http.get("api/school")
+            this.$http.get("api/school?size="+this.sizeData+"&page="+this.currentPage)
               .then(response=>{
-                  this.schools = response.body
+                  this.schools = response.body.data
                   this.showSpinner = false
+                  this.totalPages = response.body.last_page
               })
           },          
           allDepartments(){
@@ -266,7 +314,16 @@
                     })
               }
             
-          },    
+          },
+        getNumber(num){
+            return new Array(num);
+         },
+         changePage(page){
+             if(page != 0 && page <= this.totalPages){
+                this.currentPage = page
+                this.searchSchool()
+             }             
+         },   
           allSchoolGrades(){
             this.$http.get("api/school-grade")
               .then(response=>{
@@ -304,17 +361,16 @@
                }, this);
             });
           },
-          searchSchool(){              
-            if(this.searchParam!=''){
+          searchSchool(){
+                if(!this.searchParam){
+                    this.searchParam = null
+                }
                 this.showSpinner = true          
-                this.$http.get("api/search-school/"+this.searchParam).then((response)=>{
-                    this.schools = response.body
+                this.$http.get("api/search-school/"+this.searchParam+"?size="+this.sizeData+"&page="+this.currentPage).then((response)=>{
+                    this.schools = response.body.data
+                    this.totalPages = response.body.last_page
                     this.showSpinner = false                 
-                })
-            }
-            else{
-                this.allSchools()
-            }
+                })            
           },
           saveOrUpdateSchool(){              
             this.$validator.validateAll();
@@ -347,7 +403,7 @@
           },
           saveSchool(){
                 this.$http.post("api/school/",this.schooldata).then(()=>{
-                    this.allSchools()
+                    this.searchSchool()
                     swal({
                         position: 'top-right',
                         type: 'success',
@@ -367,7 +423,7 @@
           },          
           updateSchool(){           
                 this.$http.put("api/school/"+this.schooldata.id_colegio,this.schooldata).then((response)=>{
-                    this.allSchools()
+                    this.searchSchool()
                     swal({
                         position: 'top-right',
                         type: 'success',
@@ -396,8 +452,15 @@
           }
       },
       watch : {
+          sizeData: function(){
+                this.currentPage = 1
+                this.searchSchool()
+          },
           searchParam: function(){
-              this.searchSchool()
+              var validateSrch = !this.searchParam ? '' : this.searchParam;
+              if(validateSrch.length>=3 || validateSrch == ''){
+                  this.searchSchool()
+              }     
           },
           depSelected: function(){
               if(this.formType == 'new')
