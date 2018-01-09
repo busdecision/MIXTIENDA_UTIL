@@ -82,7 +82,7 @@
                 </li>
             </ul>
       </div>
-    <modal :show.sync="modalIsOpen" effect="fade" width="400">
+    <modal :show.sync="modalIsOpen" effect="fade" width="400" :backdrop="false">
         <div slot="modal-header" class="modal-header" align="center">
             <h4 class="modal-title" v-if="formType == 'new'">Registrar Grupo Poducto</h4>
             <h4 class="modal-title" v-if="formType == 'edit'">Editar Grupo Poducto</h4>
@@ -93,7 +93,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <form class="form-horizontal">
-                            <div class="form-group col-md-12">                           
+                            <div class="form-group col-md-12" v-if="formType != 'new'">                           
                                 <label class="control-label col-sm-4" for="email">ID:</label>
                                 <div class="col-sm-8">
                                     <input type="text" class="form-control input-sm" v-model="groupProductData.id_grupo_producto" :disabled="true">
@@ -164,28 +164,32 @@
                     </div>
                     <br>
                     <div class="row">
-                        <div class="col-md-5">
+                        <div class="col-md-5">                            
                             <table class="table table-striped table-bordered table-condensed">
-                            <thead>
-                                <tr>
-                                <th></th>
-                                <th>Producto</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                              <tr v-for ="product in products">
-                                    <td align="center">
-                                        <label>
-                                            <input
-                                                v-bind:value="product"
-                                                type="checkbox"
-                                                v-model="leftProductsSelected">
-                                        </label>
-                                    </td>
-                                    <td >{{product.description}}</td>
-                                </tr>
-                            </tbody>                            
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Producto</th>
+                                    </tr>
+                                </thead>
                             </table>
+                            <div class="table-container">
+                                <table class="table table-striped table-bordered table-condensed">
+                                    <tbody>
+                                        <tr v-for ="product in products">
+                                                <td align="center">
+                                                    <label>
+                                                        <input
+                                                            v-bind:value="product"
+                                                            type="checkbox"
+                                                            v-model="leftProductsSelected">
+                                                    </label>
+                                                </td>
+                                                <td >{{product.description}}</td>
+                                            </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div class="col-md-2 add-product">
                             <a @click="addProductsSelected()">
@@ -194,21 +198,25 @@
                         </div>
                         <div class="col-md-5">
                             <table class="table table-striped table-bordered table-condensed">
-                            <thead>
-                                <tr>
-                                <th>Producto</th>
-                                <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(product,index) in groupProductData.product">
-                                    <td>{{product.description}}</td>
-                                    <td>
-                                        <button class="btn btn-danger btn-sm"@click="removeProduct(index)">Eliminar</button>
-                                    </td>
-                                </tr>
-                            </tbody>
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
                             </table>
+                            <div class="table-container">
+                            <table class="table table-striped table-bordered table-condensed">
+                                <tbody>
+                                    <tr v-for="(product,index) in groupProductData.product">
+                                        <td>{{product.description}}</td>
+                                        <td>
+                                            <button class="btn btn-danger btn-sm"@click="removeProduct(index)">Eliminar</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -250,6 +258,13 @@
     .table tbody{
        font-size: 12px;
     }
+
+    div.table-container {
+      height: 250px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      margin-top: -20px;
+    }
 </style>
 
 <script>
@@ -289,6 +304,9 @@
               this.$validator.validateAll();
           },
           searchProductGroups(){
+            if(!this.searchParam){
+                this.searchParam = null
+            }
             this.showSpinner = true
             this.$http.get("api/search-product-group/"+this.searchParam+"?size="+this.sizeData+"&page="+this.currentPage)
               .then(response=>{
@@ -413,10 +431,10 @@
                 this.searchProductGroups()
             },
             searchParam: function(){
-                if(this.searchParam == ''){                    
-                    this.searchParam = null
-                }
-                this.searchProductGroups()
+                var validateSrch = !this.searchParam ? '' : this.searchParam;
+                if(validateSrch.length>=3 || validateSrch == ''){
+                    this.searchProductGroups()
+                }                
             },
             filterProduct: function(){
                 if(this.filterProduct == ''){

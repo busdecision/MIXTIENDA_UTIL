@@ -19,9 +19,10 @@
                             type="password"
                             placeholder="Password">
                     </div>
-                    <button @click="login()" class="btn btn-success pull-right">
-                        Iniciar Sesión
-                    </button>
+                    <vue-simple-spinner v-if="showSpinner" size="short" :speed="0.5" line-fg-color="green"> </vue-simple-spinner>
+                    <button @click="login()" class="btn btn-success pull-right" align="center" :disabled="showSpinner">
+                        <span>Iniciar Sesión</span>                        
+                    </button>                    
                 </div>
             </div>
         </div>        
@@ -30,12 +31,14 @@
 <script>
 import config from '../../../../config.json'
 import swal from 'sweetalert2'
+import Spinner from 'vue-simple-spinner'
 
     export default{
         data(){
             return {
                 email : '',
-                password : ''
+                password : '',
+                showSpinner : false
             }
         },
         methods:{
@@ -45,13 +48,15 @@ import swal from 'sweetalert2'
 	                    client_secret : config.clientSecret,
 	                    grant_type :  "password",
 	                    username: this.email,
-	                    password: this.password
+                        password: this.password                        
                 }
+                this.showSpinner = true
                 this.$http.post("oauth/token", data)
                     .then(response=>{
                         this.$auth.setToken(response.body.access_token, response.body.expires_in + Date.now())
-                        this.$router.go("/colegio")
-                    }, (err)=>{                        
+                        this.$router.go("/colegio")                        
+                    }, (err)=>{
+                        this.showSpinner = false
                         swal(
                         'Invalido',
                         'Credenciales invalidas',
@@ -59,6 +64,9 @@ import swal from 'sweetalert2'
                         )                    
                     })
             }
+        },
+        components:{
+            'vue-simple-spinner': Spinner
         }
     }
 </script>
