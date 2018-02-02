@@ -91,68 +91,72 @@
       </div>
       <div slot="modal-body" class="modal-body">
           <div @submit.prevent="validateBeforeSubmit" class="my-form">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-horizontal">
-                        <div class="form-group">
-                            <label class="control-label col-sm-4">ID:</label>
-                            <div class="col-sm-8">
-                                <input :disabled="true" type="number" v-model ="schooldata.id_colegio" class="form-control input-sm" >
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2">ID:</label>
+                                            <div class="col-sm-10">
+                                                <input :disabled="true" type="number" v-model ="schooldata.id_colegio" class="form-control input-sm" >
+                                            </div>
+                                        </div>
+                                        <div class="form-group" :class="{'has-error': errors.has('schooldata.des_colegio') }">
+                                            <label class="control-label col-sm-2" >Colegio:</label>
+                                            <div class="col-sm-10">
+                                                <input v-validate.initial="schooldata.des_colegio" @change="existsSchoolName()" data-vv-rules="required" :disabled="formType=='view'" type="text" v-model ="schooldata.des_colegio" class="form-control input-sm">
+                                                <p class="text-danger" v-if="errors.has('schooldata.des_colegio')">Nombre es requerido</p>
+                                                <vue-simple-spinner v-if="checkNameSpinner" size="small" message="Validando Nombre..." :speed="0.4"></vue-simple-spinner>                                
+                                                <span v-if="canUseName" class="label label-success">Nombre validado</span>
+                                                <span v-if="existSchoolName" class="label label-danger">Este nombre ya existe</span>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-horizontal">                   
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4" >Observacion:</label>
+                                            <div class="col-sm-8">
+                                                <textarea :disabled="formType=='view'" class="form-control input-sm" rows="5" v-model ="schooldata.observacion"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-horizontal">
+                                        <div class="form-group" :class="{'has-error': errors.has('depSelected')}">
+                                            <label class="control-label col-sm-4">Departamento:</label>                        
+                                            <div class="col-sm-8">
+                                                    <select v-validate.initial="depSelected"  data-vv-rules="required" :disabled="formType=='view'" class="form-control input-sm" v-model="depSelected">
+                                                        <option value=""></option>  
+                                                        <option v-bind:value="department.id_departamento" v-for="department in departments">{{department.des_departamento}}</option>
+                                                    </select>
+                                                    <p class="text-danger" v-if="errors.has('depSelected')">Departamento es requerido</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" :class="{'has-error': errors.has('provSelected')}">
+                                            <label class="control-label col-sm-4" >Provincia:</label>
+                                            <div class="col-sm-8">
+                                                    <select v-validate.initial="provSelected"  data-vv-rules="required" class="form-control input-sm" v-model="provSelected" :disabled="depSelected == '' || depSelected == null || formType=='view'">
+                                                        <option value=""></option>  
+                                                        <option v-bind:value="province.id_provincia" v-for="province in provincies">{{province.des_provincia}}</option>
+                                                    </select>
+                                                    <p class="text-danger" v-if="errors.has('provSelected')">Provincia es requerida</p>
+                                            </div>
+                                        </div>                    
+                                        <div class="form-group" :class="{'has-error': errors.has('schooldata.id_distrito')}">
+                                            <label class="control-label col-sm-4" >Distrito:</label>
+                                            <div class="col-sm-8">                            
+                                                    <select v-validate.initial="schooldata.id_distrito"  data-vv-rules="required" class="form-control input-sm" v-model="schooldata.id_distrito" :disabled="provSelected =='' || provSelected == null || formType=='view'">
+                                                        <option value=""></option>  
+                                                        <option v-bind:value="district.id_distrito" v-for="district in districts">{{district.des_distrito}}</option>
+                                                    </select>
+                                                    <p class="text-danger" v-if="errors.has('schooldata.id_distrito')">Distrito es requerido</p>
+                                            </div>                           
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group" :class="{'has-error': errors.has('schooldata.des_colegio') }">
-                            <label class="control-label col-sm-4" >Colegio:</label>
-                            <div class="col-sm-8">
-                                <input v-validate.initial="schooldata.des_colegio" @change="existsSchoolName()" data-vv-rules="required" :disabled="formType=='view'" type="text" v-model ="schooldata.des_colegio" class="form-control input-sm">
-                                <p class="text-danger" v-if="errors.has('schooldata.des_colegio')">Nombre es requerido</p>
-                                <vue-simple-spinner v-if="checkNameSpinner" size="small" message="Validando Nombre..." :speed="0.4"></vue-simple-spinner>                                
-                                <span v-if="canUseName" class="label label-success">Nombre validado</span>
-                                <span v-if="existSchoolName" class="label label-danger">Este nombre ya existe</span>
-                            </div>
-                        </div>                    
-                        <div class="form-group">
-                            <label class="control-label col-sm-4" >Observacion:</label>
-                            <div class="col-sm-8">
-                                <textarea :disabled="formType=='view'" class="form-control input-sm" rows="5" v-model ="schooldata.observacion"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-horizontal">
-                        <div class="form-group" :class="{'has-error': errors.has('depSelected')}">
-                            <label class="control-label col-sm-4">Departamento:</label>                        
-                            <div class="col-sm-8">
-                                    <select v-validate.initial="depSelected"  data-vv-rules="required" :disabled="formType=='view'" class="form-control input-sm" v-model="depSelected">
-                                        <option value=""></option>  
-                                        <option v-bind:value="department.id_departamento" v-for="department in departments">{{department.des_departamento}}</option>
-                                    </select>
-                                    <p class="text-danger" v-if="errors.has('depSelected')">Departamento es requerido</p>
-                            </div>
-                        </div>
-                        <div class="form-group" :class="{'has-error': errors.has('provSelected')}">
-                            <label class="control-label col-sm-4" >Provincia:</label>
-                            <div class="col-sm-8">
-                                    <select v-validate.initial="provSelected"  data-vv-rules="required" class="form-control input-sm" v-model="provSelected" :disabled="depSelected == '' || depSelected == null || formType=='view'">
-                                        <option value=""></option>  
-                                        <option v-bind:value="province.id_provincia" v-for="province in provincies">{{province.des_provincia}}</option>
-                                    </select>
-                                    <p class="text-danger" v-if="errors.has('provSelected')">Provincia es requerida</p>
-                            </div>
-                        </div>                    
-                        <div class="form-group" :class="{'has-error': errors.has('schooldata.id_distrito')}">
-                            <label class="control-label col-sm-4" >Distrito:</label>
-                            <div class="col-sm-8">                            
-                                    <select v-validate.initial="schooldata.id_distrito"  data-vv-rules="required" class="form-control input-sm" v-model="schooldata.id_distrito" :disabled="provSelected =='' || provSelected == null || formType=='view'">
-                                        <option value=""></option>  
-                                        <option v-bind:value="district.id_distrito" v-for="district in districts">{{district.des_distrito}}</option>
-                                    </select>
-                                    <p class="text-danger" v-if="errors.has('schooldata.id_distrito')">Distrito es requerido</p>
-                            </div>                           
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="row">
                 <div class="col-md-12">
                     <label>Seleccione:</label>
