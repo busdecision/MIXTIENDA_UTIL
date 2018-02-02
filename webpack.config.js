@@ -18,13 +18,6 @@ module.exports = {
         ],
       },
       {
-        test: /\.css$/,
-        use: [
-          'vue-style-loader',
-          'css-loader'
-        ],
-      },
-      {
         test: /\.scss$/,
         use: [
           'vue-style-loader',
@@ -37,7 +30,7 @@ module.exports = {
         use: [
           'vue-style-loader',
           'css-loader',
-          'sass-loader?indentedSytanx'
+          'sass-loader?indentedSyntax'
         ],
       },
       {
