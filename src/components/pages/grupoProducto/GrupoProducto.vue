@@ -99,38 +99,44 @@
                                     <input type="text" class="form-control input-sm" v-model="groupProductData.id_grupo_producto" :disabled="true">
                                 </div>
                             </div>
-                            <div class="form-group col-md-12" :class="{'has-error': errors.has('groupProductData.des_grupo_producto')}">
+                            <div class="form-group col-md-12" :class="{'has-error': errors.has('descProducto')}">
                                 <label class="control-label col-sm-4" for="email">Grupo Producto:</label>
                                 <div class="col-sm-8">
                                     <input  type="text" class="form-control input-sm"
-                                            data-vv-rules="required"
-                                            v-validate.initial="groupProductData.des_grupo_producto"
+                                            v-validate="'required'"
+                                            name ="descProducto"
                                             v-model="groupProductData.des_grupo_producto"
                                             :disabled="formType == 'view'">
-                                    <p class="text-danger" v-if="errors.has('groupProductData.des_grupo_producto')">Grupo Producto es requerido</p>
+                                    <p class="text-danger" v-if="errors.has('descProducto')">Grupo Producto es requerido</p>
                                 </div>
                             </div>                  
 
-                             <div class="form-group col-md-12" :class="{'has-error': errors.has('groupProductData.cod_grupo_producto')}">
+                             <div class="form-group col-md-12" :class="{'has-error': errors.has('codProducto')}">
                                 <label class="control-label col-sm-4" for="email">Código:</label>
                                 <div class="col-sm-8">
                                     <input  type="text" class="form-control input-sm"
-                                            data-vv-rules="required"
-                                            v-validate.initial="groupProductData.cod_grupo_producto"
+                                            v-validate="'required'"
+                                            name ="codProducto"
                                             v-model="groupProductData.cod_grupo_producto"
                                             :disabled="formType == 'view'">
-                                    <p class="text-danger" v-if="errors.has('groupProductData.cod_grupo_producto')">Código es requerido</p>
+                                    <p class="text-danger" v-if="errors.has('codProducto')">Código es requerido</p>
                                 </div>
                             </div>
-                             <div class="form-group col-md-12" :class="{'has-error': errors.has('groupProductData.id_color')}">
+                             <div class="form-group col-md-12" :class="{'has-error': errors.has('color')}">
                                 <label class="control-label col-sm-4" for="email">Color:</label>
                                 <div class="col-sm-8">
-                                    <select name="" class="form-control input-sm" data-vv-rules="required" v-validate.initial="groupProductData.id_color" v-model="groupProductData.id_color" :disabled="formType == 'view'">
+                                    <select
+                                        name="color"
+                                        v-validate="'required'"
+                                        class="form-control input-sm"
+                                        data-vv-rules="required"
+                                        v-validate.initial="groupProductData.id_color"
+                                        v-model="groupProductData.id_color" :disabled="formType == 'view'">
                                         <option value="" v-for="color in colors" v-bind:value="color.id_color">
                                             {{color.des_color}}
                                         </option>
                                     </select>
-                                    <p class="text-danger" v-if="errors.has('groupProductData.id_color')">Color es requerido</p>
+                                    <p class="text-danger" v-if="errors.has('color')">Color es requerido</p>
                                 </div>
                             </div>
                         </form>
@@ -301,7 +307,19 @@
         },
         methods : {
           validateBeforeSubmit(){
-              this.$validator.validateAll();
+              //this.$validator.validateAll();
+              this.$validator.validateAll().then((result) => {
+                if (result) {
+                    return;
+                }
+                else{
+                    swal(
+                        'Oops...',
+                        'Por favor complete los campos requeridos',
+                        'error'
+                    )
+                }
+            });
           },
           searchProductGroups(){
             if(!this.searchParam){

@@ -23,11 +23,20 @@
                                                 <input :disabled="true" type="number" v-model ="schooldata.id_colegio" class="form-control input-sm" >
                                             </div>
                                         </div>
-                                        <div class="form-group" :class="{'has-error': errors.has('schooldata.des_colegio') }">
+                                        <div class="form-group" :class="{'has-error': errors.has('colegio') }">
                                             <label class="control-label col-sm-2" >Colegio:</label>
                                             <div class="col-sm-10">
-                                                <input v-validate.initial="schooldata.des_colegio" @change="existsSchoolName()" data-vv-rules="required" :disabled="formType=='view'" type="text" v-model ="schooldata.des_colegio" class="form-control input-sm">
-                                                <p class="text-danger" v-if="errors.has('schooldata.des_colegio')">Nombre es requerido</p>
+                                                <input
+                                                    name="colegio"
+                                                    v-model ="schooldata.des_colegio"
+                                                    v-validate="'required'"
+                                                    :disabled=" formType=='view'"
+                                                    type="text"
+                                                    class="form-control input-sm"
+                                                    :class="{'input': true, 'is-danger': errors.has('email') }"
+                                                    @change="existsSchoolName()">
+
+                                                <p class="text-danger" v-if="errors.has('colegio')">Nombre es requerido</p>
                                                 <vue-simple-spinner v-if="checkNameSpinner" size="small" message="Validando Nombre..." :speed="0.4"></vue-simple-spinner>                                
                                                 <span v-if="canUseName" class="label label-success">Nombre validado</span>
                                                 <span v-if="existSchoolName" class="label label-danger">Este nombre ya existe</span>
@@ -47,34 +56,47 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-horizontal">
-                                        <div class="form-group" :class="{'has-error': errors.has('depSelected')}">
+                                        <div class="form-group" :class="{'has-error': errors.has('departamento')}">
                                             <label class="control-label col-sm-4">Departamento:</label>                        
                                             <div class="col-sm-8">
-                                                    <select v-validate.initial="depSelected"  data-vv-rules="required" :disabled="formType=='view'" class="form-control input-sm" v-model="depSelected">
+                                                    <select
+                                                        name ="departamento"
+                                                         v-validate="'required'"
+                                                         :disabled="formType=='view'"
+                                                         class="form-control input-sm"
+                                                         v-model="depSelected">
                                                         <option value=""></option>  
                                                         <option v-bind:value="department.id_departamento" v-for="department in departments">{{department.des_departamento}}</option>
                                                     </select>
-                                                    <p class="text-danger" v-if="errors.has('depSelected')">Departamento es requerido</p>
+                                                    <p class="text-danger" v-if="errors.has('departamento')">Departamento es requerido</p>
                                             </div>
                                         </div>
-                                        <div class="form-group" :class="{'has-error': errors.has('provSelected')}">
+                                        <div class="form-group" :class="{'has-error': errors.has('provincia')}">
                                             <label class="control-label col-sm-4" >Provincia:</label>
                                             <div class="col-sm-8">
-                                                    <select v-validate.initial="provSelected"  data-vv-rules="required" class="form-control input-sm" v-model="provSelected" :disabled="depSelected == '' || depSelected == null || formType=='view'">
+                                                    <select
+                                                        name="provincia"
+                                                        v-validate="'required'"
+                                                        class="form-control input-sm"
+                                                        v-model="provSelected" :disabled="depSelected == '' || depSelected == null || formType=='view'">
                                                         <option value=""></option>  
                                                         <option v-bind:value="province.id_provincia" v-for="province in provincies">{{province.des_provincia}}</option>
                                                     </select>
-                                                    <p class="text-danger" v-if="errors.has('provSelected')">Provincia es requerida</p>
+                                                    <p class="text-danger" v-if="errors.has('provincia')">Provincia es requerida</p>
                                             </div>
                                         </div>                    
-                                        <div class="form-group" :class="{'has-error': errors.has('schooldata.id_distrito')}">
+                                        <div class="form-group" :class="{'has-error': errors.has('distrito')}">
                                             <label class="control-label col-sm-4" >Distrito:</label>
-                                            <div class="col-sm-8">                            
-                                                    <select v-validate.initial="schooldata.id_distrito"  data-vv-rules="required" class="form-control input-sm" v-model="schooldata.id_distrito" :disabled="provSelected =='' || provSelected == null || formType=='view'">
+                                            <div class="col-sm-8">                           
+                                                    <select
+                                                        name="distrito"
+                                                        v-validate="'required'"
+                                                        class="form-control input-sm"
+                                                        v-model="schooldata.id_distrito" :disabled="provSelected =='' || provSelected == null || formType=='view'">
                                                         <option value=""></option>  
                                                         <option v-bind:value="district.id_distrito" v-for="district in districts">{{district.des_distrito}}</option>
                                                     </select>
-                                                    <p class="text-danger" v-if="errors.has('schooldata.id_distrito')">Distrito es requerido</p>
+                                                    <p class="text-danger" v-if="errors.has('distrito')">Distrito es requerido</p>
                                             </div>                           
                                         </div>
                                     </div>
@@ -254,35 +276,45 @@ table {
           },
           saveOrUpdateSchool(){              
             this.$validator.validateAll();
-            if(this.existSchoolName){
-                swal(
-                    'Oops...',
-                    'Este nombre ya existe, por favor ingrese otro',
-                    'error'
-                )
-                return
-            }
-            if (!this.errors.any()) {
-                if(this.schooldata.school_grades_id.length > 0){
-                    if(this.formType == "new"){
-                        this.saveSchool()
+             this.$validator.validateAll().then((result) => {
+                    if (result) {
+                        if(this.existSchoolName){
+                            swal(
+                            'Oops...',
+                            'Este nombre ya existe, por favor ingrese otro',
+                            'error'
+                            )
+                            return;
+                        }
+                        if (!this.errors.any()) {
+                            if(this.schooldata.school_grades_id.length > 0){
+                                if(this.formType == "new"){
+                                    this.saveSchool()
+                                }
+                                else if(this.formType == "edit"){
+                                    this.updateSchool()
+                                }
+                            }
+                            else{
+                                swal(
+                                    'Oops...',
+                                    'Por favor seleccione por lo menos un grado',
+                                    'error'
+                                )
+                            }
+                        }
                     }
-                    else if(this.formType == "edit"){
-                        this.updateSchool()
+                    else{
+                        swal(
+                            'Oops...',
+                            'Por favor complete los campos requeridos',
+                            'error'
+                        )
                     }
-                }
-                else{
-                    swal(
-                        'Oops...',
-                        'Por favor seleccione por lo menos un grado',
-                        'error'
-                    )
-                }
-            }
-                     
+            });                     
           },
           saveSchool(){
-                this.$http.post("api/school/",this.schooldata).then(()=>{
+                this.$http.post("api/school",this.schooldata).then(()=>{
                     swal({
                         position: 'top-right',
                         type: 'success',
