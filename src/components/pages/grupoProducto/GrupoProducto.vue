@@ -152,7 +152,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="product in groupProductData.product">
-                                <td>{{product.description}}</td>
+                                <td>{{product.name}}</td>
                             </tr>
                         </tbody>
                         </table>
@@ -191,7 +191,7 @@
                                                             v-model="leftProductsSelected">
                                                     </label>
                                                 </td>
-                                                <td >{{product.description}}</td>
+                                                <td >{{product.name}}</td>
                                             </tr>
                                     </tbody>
                                 </table>
@@ -215,7 +215,7 @@
                             <table class="table table-striped table-bordered table-condensed">
                                 <tbody>
                                     <tr v-for="(product,index) in groupProductData.product">
-                                        <td>{{product.description}}</td>
+                                        <td>{{product.name}}</td>
                                         <td>
                                             <button class="btn btn-danger btn-sm"@click="removeProduct(index)">Eliminar</button>
                                         </td>
